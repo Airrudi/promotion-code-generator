@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<script th:src="@{/slotmachine/jquery-1.11.3.js}"></script>
+		<script th:src="@{/slotmachine/jquery.easing.1.3.js}"></script>
+		<script th:src="@{/slotmachine/ezslots.js}"></script>
+		<link th:href="@{/slotmachine/ezslots.css}" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" th:href="@{/style.css}" />
+	</head>
+	
+	<body>
+	
+	<form id="activateSpinnerForm" action="" method="POST" th:classappend="${metadata.getWinningCode() != null} ? ready">		
+		<input id="activateSpinner" name="activateSpinner" type="hidden" value="1"/>
+	</form>
+	
+	<input id="winningCode" type="hidden" th:value="${metadata.getWinningCode()}"/>
+	
+	<a href="/" class="button back">Terug naar home</a>
+	<a href="/load/" class="button back">Terug naar alle acties</a>
+	
+
+<style>
+	body{width:100%; background-color:white; padding:0px; margin:0px; }
+	#ezslots2 .window {font-size:40px; font-family:arial,helvetica,sans-serif; border:1px solid black; margin-top:40px;}
+</style>
+
+<div id="ezslots2"></div>
+<button th:if="${metadata.getWinningCode() == null}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
+
+<script>
+
+function activateSpinner(){
+	$('#activateSpinnerForm').submit();
+}
+
+$(function(){
+		
+	var misc = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+	
+	var winningCode = document.getElementById("winningCode").value.toUpperCase().split('');
+	console.log(winningCode);
+	
+	var matchArray = [];
+	
+	for(i in winningCode){
+		var character = winningCode[i];
+		var matchIndex = misc.indexOf(character);
+		matchArray.push(matchIndex);		
+	}
+	
+	console.log(matchArray);
+		
+	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":126,"width":126});
+	
+	if($(".ready").length > 0){		
+		ezslot2.win();
+	}
+	//$(".spinnerReady").click(function(){ console.log(ezslot2.win())});
+});
+
+</script>
+	
+	</body>
+</html>

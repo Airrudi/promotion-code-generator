@@ -1,0 +1,33 @@
+@CHARSET "ISO-8859-1";
+
+body{background-color:#efefef; font-family:sans-serif; width:750px; margin:0 auto;}
+p{font-size:15px;}
+*{margin:0; padding:0; border:0;}
+a{text-decoration:none;}
+
+.page{width:75%; max-width:800px; margin:0 auto; text-align:center; padding:50px 0;}
+
+
+/* Home */
+#buttonContainer{margin-top:50px;}
+.button{transition:.2s; cursor:pointer; background-color:#137fbf; font-size:16px; color:#fff; padding:10px 12px; border-radius:5px; display:inline-block;}
+.button:hover{opacity:.7;}
+.button.new{background-color:green;}
+.button.back{background-color:#7e7e7e;}
+
+fieldset{border: none; padding: 0; margin: 0;}
+.error p{color:red;}
+
+.spinnerButton{font-size:50px; padding:40px 60px; background-color:green; border-radius:15px; display:inline-block; margin:0 auto;}
+
+#promotionContainer .promotion{padding:25px; margin:20px 0; border-radius:10px; background-color:#fff; transition:.2s; position:relative;}
+#promotionContainer .promotion .delete{background-color:#bf1313;  font-size:16px; position:absolute; right:25px; top:50%; transform:translateY(-50%); }
+#promotionContainer .promotion h3{margin-bottom:5px; font-size:22px;}
+#promotionContainer .promotion .date{margin-bottom:15px; font-size:12px;}
+/*#promotionContainer .promotion:hover{background-color:rgba(256,256,256,.5);}*/
+#promotionContainer .promotion ul{list-style-type:none;}
+#promotionContainer .promotion ul li{}
+#promotionContainer .promotion ul li p{display:inline-block;}
+#promotionContainer .promotion ul li p.label{font-weight:bold;}
+#promotionContainer .promotion ul li p.value{}
+#promotionContainer .promotion .note{margin-top:20px;}

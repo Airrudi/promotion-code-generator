@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1"/>
+<title>Insert title here</title>
+<link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+	<h1>Home</h1>	
+	<h2>OCS</h2>
+	
+	<!-- TODO: winningCode is "", but gets through if check below..  -->
+	<h3 th:inline="text" th:if='${winningCode != null}'>De winnende code van [[${title}]] is: [[${winningCode}]]</h3>	
+	
+	<form action="/winner/" method="POST" th:if='${title != null}'>	
+		<input type="hidden" name="pickWinner" value="1"/>	
+		<input type="submit" value="Kies winnaar"/>
+	</form>
+	
+	
+	<a class="button" href="/generate/">Nieuwe beurs</a>
+	<a class="button" href="/load/">Bestaande beurs openen</a>	
+</body>
+</html>

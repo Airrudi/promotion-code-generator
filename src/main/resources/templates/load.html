@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1"/>
+<title>Promoties laden</title>
+<link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+<body>
+	<h1>Codes laden</h1>	
+	
+	
+	<form id="winnerForm" action="/load/promotion/" method="POST">	
+		<input id="winnerPromoId" name="promoId" type="hidden" value=""/>
+	</form>
+	
+	<form id="deleteForm" action="" method="POST">	
+		<input id="deletePromoId" name="promoId" type="hidden" value=""/>
+	</form>
+	
+	<div id="promotionContainer">
+		<div class="promotion" th:each="promo : ${promotions}">			
+			<h3 th:text="${promo.value.title}"></h3>					
+			<p class="date" th:text="${promo.value.creationDate}"></p>
+			
+			<ul>
+				<li>
+					<p class="label">Aantal codes:</p>
+					<p class="value" th:text="${promo.value.numberOfCodes}"></p>
+					<!-- <a href="">Bekijk codes</a> -->
+				</li>
+				<li><p class="label">Winnende code:</p>
+					<p th:if="${promo.value.winningCode != null}" class="value" th:text="${promo.value.winningCode}"></p>
+					<p th:if="${promo.value.winningCode == null}" class="button" th:onclick="'javascript:pickWinner(\''+ ${promo.key} + '\');'">Kies winnende code</p>
+				</li>
+			</ul>
+			
+			<p class="note" th:text="${promo.value.note}"></p>	
+			<p class="delete button" th:text="Verwijderen" th:onclick="'javascript:deletePromo(\''+ ${promo.key} + '\');'"></p>
+		</div>
+	</div>
+	
+	<a href="/" class="button back">Terug naar home</a>
+	<a href="/generate/" class="button new">Nieuwe actie aanmaken</a>
+	
+	<script>
+		function pickWinner(promoId){		
+			document.getElementById("winnerPromoId").value = promoId;
+			document.getElementById("winnerForm").submit();
+		}
+		
+		function deletePromo(promoId){
+			document.getElementById("deletePromoId").value = promoId;
+			document.getElementById("deleteForm").submit();
+		}
+	</script>
+
+</body>
+</html>

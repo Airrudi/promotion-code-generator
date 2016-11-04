@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="ISO-8859-1"/>
+		<title>Codes genereren</title>
+		<link rel="stylesheet" th:href="@{/style.css}" />
+	</head>
+	<body>
+		<h1>Codes genereren</h1>
+		
+		<form action="" method="POST">
+			<fieldset th:classappend="${errorTitle} ? error">
+				<p th:if="${errorTitle}">Wat is de titel van de actie?</p>
+				<label for="title">Titel van de actie *</label>
+				<input id="title" name="title" type="text" th:value="${title}"/>				
+			</fieldset>
+			
+			<fieldset th:classappend="${errorNumberOfCodes} ? error">
+				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
+				<label for="numberOfCodes">Aantal codes *</label>
+				<input id="numberOfCodes" name="numberOfCodes" type="number" th:value="${numberOfCodes}"/>				
+			</fieldset>
+			
+			<fieldset>
+				<label for="note">Opmerkingen:</label>
+				<textarea id="note" name="note" th:text="${note}"></textarea>
+			</fieldset>
+			
+			<input class="button" type="submit" value="Opslaan"/>
+		</form>
+		
+		<a href="/" class="button back">Terug naar home</a>
+		<a href="/load/" class="button back">Terug naar overzicht</a>
+		
+		<!-- Generate codes -->
+		<!-- Save codes to file -->
+		<!-- Return to home -->
+	
+	</body>
+</html>
