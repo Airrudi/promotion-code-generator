@@ -1,10 +1,6 @@
 package nl.ruudclaassen.jfall3.data;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -36,10 +32,11 @@ public class CodeFileRepository implements CodeRepository {
 		String fileName = buildFileName(id);
 		File file = new File(fileName);
 		
-		try(FileWriter fw = new FileWriter(file, true);
+		try(FileWriter fw = new FileWriter(fileName, true);
 			BufferedWriter bw = new BufferedWriter(fw);
-			PrintWriter out = new PrintWriter(bw);						
+			PrintWriter out = new PrintWriter(bw);
 		){
+
 			// Print every code on a new line
 			for(String code : codes){
 				out.println(code);
@@ -51,6 +48,8 @@ public class CodeFileRepository implements CodeRepository {
 			return false;
 		}
 	}
+
+
 	
 	public boolean delete(String promoId){				
 		

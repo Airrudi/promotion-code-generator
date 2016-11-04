@@ -1,9 +1,6 @@
 package nl.ruudclaassen.jfall3.data;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -19,18 +16,33 @@ public class MetadataFileRepository implements MetadataRepository {
 	
 	private static final String METAFILE = "metafile.csv";
 	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,winningCode";
-	
+
 	@Override
 	public Map<String, Metadata> load(){			
 		Map<String, Metadata> metadataMap = new HashMap<>();
-		
-		try (Stream<String> stream = Files.lines(Paths.get(METAFILE))) {			
-			stream.skip(1).forEach(s -> convertToMap(s, metadataMap));				
-		} catch (IOException e) {//			
-			throw new RuntimeException("File not found");
+
+		System.out.println("Start reading metafile from " + Paths.get(METAFILE).toAbsolutePath());
+		try (Stream<String> stream = Files.lines(Paths.get(METAFILE))) {
+			stream.skip(1).forEach(s -> convertToMap(s, metadataMap));
+		} catch (IOException e) {
+			System.out.println("Failed to read metafile from " + Paths.get(METAFILE).toAbsolutePath() + ", creating new one");
+			this.createMetaFile();
+			e.printStackTrace();
+			//throw new RuntimeException("File not found");
+		} finally{
+			return metadataMap;
 		}
-		
-		return metadataMap;
+	}
+
+	private void createMetaFile(){
+		try(FileWriter fw = new FileWriter(METAFILE, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter out = new PrintWriter(bw);
+		){
+			out.println(HEADERS);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void convertToMap(String metadataLine, Map<String, Metadata> metadataMap) {
