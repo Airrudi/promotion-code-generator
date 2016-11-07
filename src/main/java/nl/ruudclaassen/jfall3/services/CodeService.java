@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import nl.ruudclaassen.jfall3.data.MetadataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,31 +29,47 @@ public class CodeService {
 	CodeFileRepository codeFileRepository;
 	
 	@Autowired
-	MetadataFileRepository metadataFileRepository;
+	MetadataRepository metadataRepository;
 	
 	@Autowired
 	WinnerService winnerService;
 	
-	public Metadata save(String title, String numberOfCodes, String note) throws InputValidationException{
-		
-		validateInput(title, numberOfCodes);
-				
-		// Remove "," to prevent csv parsing issues (delimiter)
-		title = title.replaceAll(",", " ");
-		note = note.replaceAll(",", " ");	
-		int parsedNumberOfCodes = Integer.parseInt(numberOfCodes);
+	public Metadata save(Metadata metadata) throws InputValidationException{
+		validateInput(metadata);
+		formatMetadata(metadata);
 
-		Set<String> codes = generatorService.generateCodes(parsedNumberOfCodes);
 		String id = UUID.randomUUID().toString();
-		
-		codeFileRepository.save(id, codes);		
+		Set<String> codes = generatorService.generateCodes(metadata.getNumberOfCodes());
 
-		String formattedDateTime = getFormattedDate();
-		Metadata metadata = new Metadata(id, title, note, formattedDateTime, parsedNumberOfCodes);
-		metadataFileRepository.save(metadata);	
+		metadata.setId(id);
+		metadata.setCreationDate(getFormattedDate());
+
+		codeFileRepository.save(id, codes);
+		metadataRepository.save(metadata);
 		
 		return metadata;
 	}
+
+	private Metadata formatMetadata(Metadata metadata){
+
+		String title = metadata.getTitle();
+		String note = metadata.getNote();
+
+		// Remove "," to prevent csv parsing issues (delimiter)
+		title = title.replaceAll(",", " ");
+
+		// TODO: Replace by regex
+		note = note.replaceAll("[\n\r]", " ").replaceAll(",", " ");
+
+		metadata.setTitle(title);
+		metadata.setNote(note);
+
+		return metadata;
+	}
+
+
+
+
 
 
 	private String getFormattedDate() {
@@ -62,25 +79,16 @@ public class CodeService {
 	}
 
 
-	private void validateInput(String title, String numberOfCodes) throws InputValidationException {
+	private void validateInput(Metadata metadata) throws InputValidationException {
 		List<Field> fields = new ArrayList<>();
-		boolean isNumberCorrect = true;
-		int parsedNumber = 0;		
-
-		try{
-			parsedNumber = Integer.parseInt(numberOfCodes);
-		} catch(NumberFormatException nfe){
-			isNumberCorrect = false;
-		}
-		
-		System.out.println(parsedNumber);
-		System.out.println(isNumberCorrect);
+		String title = metadata.getTitle();
+		int numberOfCodes = metadata.getNumberOfCodes();
 		
 		if(title.equals("")){
 			fields.add(Field.TITLE);
 		}		
 		
-		if(!isNumberCorrect || parsedNumber <= 0){
+		if(numberOfCodes <= 0){
 			fields.add(Field.NUMBER_OF_CODES);
 		}		
 		
@@ -93,7 +101,7 @@ public class CodeService {
 		Map<String, Metadata> metadataMap = new HashMap<>();
 		
 		codeFileRepository.delete(promoId);
-		metadataMap = metadataFileRepository.delete(promoId);
+		metadataMap = metadataRepository.delete(promoId);
 		
 		return metadataMap;
 	}
@@ -105,13 +113,21 @@ public class CodeService {
 		String winningCode = winnerService.pickWinner(codes);
 		
 		metadata.setWinningCode(winningCode);
-		metadataFileRepository.save(promoId, metadata);
+		metadataRepository.save(metadata);
 		
 		return metadata;
 	}
 
 	
-	public Metadata getMetadataById(String promoId){
-		return metadataFileRepository.getMetadataById(promoId);
+	public Metadata getMetadataById(
+			String promoId){
+		return metadataRepository.getMetadataById(promoId);
 	}
+
+	public Map<String,Metadata> load(){
+		return metadataRepository.load();
+	}
+
+
+
 }

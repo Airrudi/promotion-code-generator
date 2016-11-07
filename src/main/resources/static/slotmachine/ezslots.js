@@ -65,7 +65,7 @@ function EZSlots(id,useroptions){
 		var marginTop = -(heightBefore + ((that.endingLocation) * that.height));
 		jqoSlider.stop(true,true).animate(
 			{"margin-top":marginTop+"px"},
-			{'duration' : that.time + Math.round(Math.random()*1000), 'easing' : "easeInOutQuart"});
+			{'duration' : that.time + Math.round(Math.random()*1000), 'easing' : "easeOutQuart"});
 		return chosen;
 	}
 

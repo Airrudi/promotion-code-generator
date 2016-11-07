@@ -58,12 +58,14 @@ public class MetadataFileRepository implements MetadataRepository {
 		Metadata metadata = new Metadata(metadataArray[0], metadataArray[1], metadataArray[2], metadataArray[3], Integer.parseInt(metadataArray[4]), metadataArray[5]);
 		metadataMap.put(metadata.getId(), metadata);
 	}
-	
+
+	@Override
 	public Metadata getMetadataById(String promoId){
 		Map<String, Metadata> metadataMap = this.load();		
 		return metadataMap.get(promoId);
 	}
-	
+
+	@Override
 	public Map<String, Metadata> delete(String promoId){
 		Map<String, Metadata> metadataMap = new HashMap<>();
 		metadataMap = this.load();		
@@ -75,42 +77,43 @@ public class MetadataFileRepository implements MetadataRepository {
 	}
 	
 	@Override
-	public boolean save(Metadata metadata){
-
-		try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(METAFILE, true))){
-			bufferedWriter.append(metadata.toString());			
-			return true;
+	public Metadata save(Metadata metadata){
+		try(FileWriter fileWriter = new FileWriter(METAFILE, true);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			PrintWriter printWriter = new PrintWriter(bufferedWriter);){
+			printWriter.println(metadata.toString());
 		} catch (IOException e) {
 			System.out.println("Error in file");
-			return false;
 		}
+
+		return metadata;
 	}
 	
-	public boolean save(Map<String, Metadata> metadataMap){		
-		
+	public boolean save(Map<String, Metadata> metadataMap){
+
 		// Overwrites existing file
 		try (PrintWriter writer = new PrintWriter(METAFILE, "UTF-8")){
-			writer.println(HEADERS);		
-				
+			writer.println(HEADERS);
+
 			// Print the entries
 			metadataMap.forEach((promoId, metadata)->writer.println(metadata));
-			
-			return true;			
-		
+
+			return true;
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Schrijven mislukt");
 			return false;
-		}	
+		}
 	}
 	
 	
 	public boolean save(String promoId, Metadata metadata){
 		Map<String, Metadata> metadataMap = this.load();
 		
-		metadataMap.put(promoId, metadata);		
+		metadataMap.put(promoId, metadata);
 		this.save(metadataMap);
-		
+
 		return true;
 	}
 

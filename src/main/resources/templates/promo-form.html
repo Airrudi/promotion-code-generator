@@ -8,33 +8,34 @@
 	<body>
 		<h1>Codes genereren</h1>
 		
-		<form action="" method="POST">
+		<form action="" method="POST" th:object="${metadata}">
 			<fieldset th:classappend="${errorTitle} ? error">
 				<p th:if="${errorTitle}">Wat is de titel van de actie?</p>
 				<label for="title">Titel van de actie *</label>
-				<input id="title" name="title" type="text" th:value="${title}"/>				
+				<input id="title" th:field="*{title}"/>
 			</fieldset>
 			
-			<fieldset th:classappend="${errorNumberOfCodes} ? error">
+			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${newPromo}">
 				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
 				<label for="numberOfCodes">Aantal codes *</label>
-				<input id="numberOfCodes" name="numberOfCodes" type="number" th:value="${numberOfCodes}"/>				
+				<input id="numberOfCodes" th:field="*{numberOfCodes}"/>
 			</fieldset>
+
+			<!--<fieldset>-->
+				<!--<label for="upload">Codes uploaden:</label>-->
+				<!--<input id="upload" type="file" value=""/>-->
+			<!--</fieldset>-->
 			
 			<fieldset>
 				<label for="note">Opmerkingen:</label>
-				<textarea id="note" name="note" th:text="${note}"></textarea>
+				<textarea id="note" th:field="*{note}"></textarea>
 			</fieldset>
 			
 			<input class="button" type="submit" value="Opslaan"/>
 		</form>
 		
 		<a href="/" class="button back">Terug naar home</a>
-		<a href="/load/" class="button back">Terug naar overzicht</a>
-		
-		<!-- Generate codes -->
-		<!-- Save codes to file -->
-		<!-- Return to home -->
+		<a href="/promo/" class="button back">Terug naar overzicht</a>
 	
 	</body>
 </html>

@@ -10,14 +10,14 @@
 	
 	<body>
 	
-	<form id="activateSpinnerForm" action="" method="POST" th:classappend="${metadata.getWinningCode() != null} ? ready">		
+	<form id="activateSpinnerForm" th:action="@{spin/}" method="POST" th:classappend="${spin == true} ? ready">
 		<input id="activateSpinner" name="activateSpinner" type="hidden" value="1"/>
 	</form>
 	
 	<input id="winningCode" type="hidden" th:value="${metadata.getWinningCode()}"/>
 	
 	<a href="/" class="button back">Terug naar home</a>
-	<a href="/load/" class="button back">Terug naar alle acties</a>
+	<a href="/promo/" class="button back">Terug naar alle acties</a>
 	
 
 <style>
@@ -26,7 +26,9 @@
 </style>
 
 <div id="ezslots2"></div>
-<button th:if="${metadata.getWinningCode() == null}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
+<button th:if="${spin == false}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
+
+	<h2 id="winner" style="display:none;" th:text="${winner}">Peter de Vries</h2>
 
 <script>
 
@@ -54,10 +56,14 @@ $(function(){
 		
 	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":126,"width":126});
 	
-	if($(".ready").length > 0){		
+	if($(".ready").length > 0){
 		ezslot2.win();
+
+		// Winning code is shown after 8500ms (current setting), show winner after 9500ms
+		setTimeout(function(){
+			$("#winner").fadeIn()
+		}, 8000);
 	}
-	//$(".spinnerReady").click(function(){ console.log(ezslot2.win())});
 });
 
 </script>
