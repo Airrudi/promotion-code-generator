@@ -32,3 +32,11 @@ fieldset{border: none; padding: 0; margin: 0;}
 #promotionContainer .promotion ul li p.label{font-weight:bold;}
 #promotionContainer .promotion ul li p.value{}
 #promotionContainer .promotion .note{margin-top:20px;}
+
+/* CONTENT - WINNER PAGE*/
+#content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:100px; height:350px; position:relative;}
+#content .spinner{margin-bottom:50px;}
+#content .spinner.done{}
+#content h2{}
+#content #buttonContainer{position:absolute; bottom:0; left:50%; transform:translateX(-50%);}
+

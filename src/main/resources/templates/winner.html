@@ -16,8 +16,7 @@
 	
 	<input id="winningCode" type="hidden" th:value="${metadata.getWinningCode()}"/>
 	
-	<a href="/" class="button back">Terug naar home</a>
-	<a href="/promo/" class="button back">Terug naar alle acties</a>
+
 	
 
 <style>
@@ -25,10 +24,16 @@
 	#ezslots2 .window {font-size:40px; font-family:arial,helvetica,sans-serif; border:1px solid black; margin-top:40px;}
 </style>
 
-<div id="ezslots2"></div>
-<button th:if="${spin == false}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
+	<div id="content">
+		<div id="ezslots2" class="spinner"></div>
+		<button th:if="${spin == false}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
+		<h2 id="winner" style="display:none;" th:text="${winner}">Peter de Vries</h2>
 
-	<h2 id="winner" style="display:none;" th:text="${winner}">Peter de Vries</h2>
+		<div id="buttonContainer">
+			<a href="/" class="button back">Terug naar home</a>
+			<a href="/promo/" class="button back">Terug naar alle acties</a>
+		</div>
+	</div>
 
 <script>
 
@@ -54,14 +59,18 @@ $(function(){
 	
 	console.log(matchArray);
 		
-	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":126,"width":126});
+	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":75,"width":50});
 	
 	if($(".ready").length > 0){
 		ezslot2.win();
 
+		setTimeout(function(){
+			$(".spinner").addClass("done");
+		}, 7500);
+
 		// Winning code is shown after 8500ms (current setting), show winner after 9500ms
 		setTimeout(function(){
-			$("#winner").fadeIn()
+			$("#winner").fadeIn();
 		}, 8000);
 	}
 });

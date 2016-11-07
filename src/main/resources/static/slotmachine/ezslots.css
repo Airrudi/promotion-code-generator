@@ -1,7 +1,22 @@
-.ezslots>.window{	
+.ezslots>.window{
+    transition:1s;
 	overflow:hidden;
 	display:inline-block;
+
+    border: none !important;
+    text-shadow: rgb(0, 0, 0) 1px 1px 1px;
+    margin-top: 40px;
+    border-radius: 10px;
+    margin-right: 5px;
+    background-color: #f37720;
+    color: #fff;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4)
 }
+
+.ezslots.done>.window{
+    background-color:#3ba13d;
+}
+
 .ezslots>.window>.slider>.symbol{
 	text-align:center;
 	display:table;	
@@ -13,3 +28,4 @@
       text-align:center;
       vertical-align:middle;
 }
+

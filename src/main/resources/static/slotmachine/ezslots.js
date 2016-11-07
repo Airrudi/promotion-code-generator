@@ -27,7 +27,7 @@ function EZSlots(id,useroptions){
 		//make each slot window
 		for(var i = 0; i < this.reelCount; i++){
 			var jqoSlider = $('<div class="slider"></div>');
-			var jqoWindow = $('<div class="window window_"'+i+'></div>');
+			var jqoWindow = $('<div class="container window window_"'+i+'></div>');
 			this.scaleJqo(jqoWindow).append(jqoSlider); //make window right size and put slider in it
 			this.jqo.append(jqoWindow); //add window to main div
 			this.jqoSliders.push(jqoSlider); //keep reference to jqo of slider
