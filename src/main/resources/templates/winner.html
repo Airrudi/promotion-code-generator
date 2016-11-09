@@ -9,6 +9,12 @@
 	</head>
 	
 	<body>
+	<div id="teaser">
+		<div id="logoContainer">
+			<span id="logo"></span>
+		</div>
+		<h1>WINACTIE</h1>
+	</div>
 	
 	<form id="activateSpinnerForm" th:action="@{spin/}" method="POST" th:classappend="${spin == true} ? ready">
 		<input id="activateSpinner" name="activateSpinner" type="hidden" value="1"/>
@@ -21,13 +27,13 @@
 
 <style>
 	body{width:100%; background-color:white; padding:0px; margin:0px; }
-	#ezslots2 .window {font-size:40px; font-family:arial,helvetica,sans-serif; border:1px solid black; margin-top:40px;}
+	#ezslots2 .window {font-size:65px; font-family:arial,helvetica,sans-serif; border:1px solid black; margin-top:40px;}
 </style>
 
 	<div id="content">
 		<div id="ezslots2" class="spinner"></div>
-		<button th:if="${spin == false}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">START DE SPINNER!</button>
-		<h2 id="winner" style="display:none;" th:text="${winner}">Peter de Vries</h2>
+		<button th:if="${spin == false}" id="spin" th:onclick="'javascript:activateSpinner();'" class="spinnerButton button">Kies de winnaar!</button>
+		<h2 id="winner" style="display:none;" th:inline="text">Open Circle Solutions feliciteert <span>[[${winner}]]</span> met de winst!</h2>
 
 		<div id="buttonContainer">
 			<a href="/" class="button back">Terug naar home</a>
@@ -59,19 +65,19 @@ $(function(){
 	
 	console.log(matchArray);
 		
-	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":75,"width":50});
+	var ezslot2 = new EZSlots("ezslots2",{"reelCount":10,"startingSet":[0,0,0,0,0,0,0,0,0,0], "winningSet":matchArray,"symbols":misc,"height":110,"width":75});
 	
 	if($(".ready").length > 0){
 		ezslot2.win();
 
 		setTimeout(function(){
 			$(".spinner").addClass("done");
-		}, 7500);
+		}, 7750);
 
 		// Winning code is shown after 8500ms (current setting), show winner after 9500ms
 		setTimeout(function(){
 			$("#winner").fadeIn();
-		}, 8000);
+		}, 8250);
 	}
 });
 

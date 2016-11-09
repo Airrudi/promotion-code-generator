@@ -7,6 +7,12 @@ a{text-decoration:none;}
 
 .page{width:75%; max-width:800px; margin:0 auto; text-align:center; padding:50px 0;}
 
+/* Winner page -----------------*/
+#teaser{height:300px; background:url("../img/winactie-header.jpg")no-repeat center center; background-size:cover; position:relative; text-align:center;}
+#teaser #logoContainer{width:100%; position:absolute; top:0; left:0; height:76px; background-color:rgba(255,255,255,0.7);}
+#teaser #logoContainer #logo{width:270px; height:100%; position:absolute; top:0; left:15px; background:url("../img/ocs-logo.png")no-repeat center center; background-size:contain;}
+#teaser h1{display:inline-block; padding:15px 45px; color:#fff; background-color:rgba(243, 119, 32, 0.7); font-size:30px; font-family:PT Sans; position:absolute; font-weight:200; top:50%; left:50%; transform:translate(-50%, -50%);}
+
 
 /* Home */
 #buttonContainer{margin-top:50px;}
@@ -18,7 +24,14 @@ a{text-decoration:none;}
 fieldset{border: none; padding: 0; margin: 0;}
 .error p{color:red;}
 
-.spinnerButton{font-size:50px; padding:40px 60px; background-color:green; border-radius:15px; display:inline-block; margin:0 auto;}
+.spinnerButton{
+    font-size: 25px;
+    padding: 25px 35px;
+    background-color: green;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 0 auto;
+}
 
 #promotionContainer .promotion{display:block; padding:25px; margin:20px 0; border-radius:10px; background-color:#fff; transition:.2s; position:relative;}
 #promotionContainer .promotion .promoLink{width:100%; height:100%; position:absolute; top:0; left:0;}
@@ -34,9 +47,10 @@ fieldset{border: none; padding: 0; margin: 0;}
 #promotionContainer .promotion .note{margin-top:20px;}
 
 /* CONTENT - WINNER PAGE*/
-#content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:100px; height:350px; position:relative;}
-#content .spinner{margin-bottom:50px;}
+#content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:10px; height:350px; position:relative;}
+#content .spinner{margin-bottom:56px;}
 #content .spinner.done{}
-#content h2{}
+#content h2{font-size:28px;}
+#content h2 span{color: #fff; background-color: #f37720; padding: 13px 14px;}
 #content #buttonContainer{position:absolute; bottom:0; left:50%; transform:translateX(-50%);}
 
