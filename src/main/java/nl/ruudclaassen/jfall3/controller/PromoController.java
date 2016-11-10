@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import nl.ruudclaassen.jfall3.model.Metadata;
 import nl.ruudclaassen.jfall3.services.CodeService;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class PromoController {
@@ -31,10 +33,12 @@ public class PromoController {
 	}
 	
 	@RequestMapping(value = "/promo/new", method = RequestMethod.POST)
-	public String createPromo(Metadata metadata, ModelMap modelMap){
+	public String createPromo(Metadata metadata, ModelMap modelMap, @RequestParam MultipartFile file){
+
+		System.out.println(file);
 		
 		try{
-			codeService.save(metadata);
+			codeService.save(metadata, file);
 			return "redirect:/promo/";
 
 		} catch(InputValidationException ive){

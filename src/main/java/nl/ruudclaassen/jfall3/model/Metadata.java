@@ -1,7 +1,7 @@
 package nl.ruudclaassen.jfall3.model;
 
-
 import javax.validation.constraints.NotNull;
+
 
 public class Metadata {
 	private String id;

@@ -36,8 +36,8 @@ public class MetadataFileRepository implements MetadataRepository {
 
 	private void createMetaFile(){
 		try(FileWriter fw = new FileWriter(METAFILE, true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			PrintWriter out = new PrintWriter(bw);
+			 BufferedWriter bw = new BufferedWriter(fw);
+			 PrintWriter out = new PrintWriter(bw);
 		){
 			out.println(HEADERS);
 		} catch (IOException e) {

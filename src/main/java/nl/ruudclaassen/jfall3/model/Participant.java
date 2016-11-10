@@ -3,12 +3,10 @@ package nl.ruudclaassen.jfall3.model;
 public class Participant {
     private String name;
     private String email;
-    private String phone;
 
-    public Participant(String name, String email, String phone) {
+    public Participant(String name, String email) {
         this.name = name;
         this.email = email;
-        this.phone = phone;
     }
 
     public String getName() {
@@ -25,13 +23,5 @@ public class Participant {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 }

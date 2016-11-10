@@ -1,5 +1,7 @@
 package nl.ruudclaassen.jfall3.services;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import nl.ruudclaassen.jfall3.data.MetadataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import nl.ruudclaassen.jfall3.data.MetadataFileRepository;
 import nl.ruudclaassen.jfall3.exceptions.InputValidationException;
 import nl.ruudclaassen.jfall3.exceptions.InputValidationException.Field;
 import nl.ruudclaassen.jfall3.model.Metadata;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CodeService {
@@ -49,6 +53,28 @@ public class CodeService {
 		
 		return metadata;
 	}
+
+	public Metadata save(Metadata metadata, MultipartFile file) throws InputValidationException{
+
+
+		return metadata;
+	}
+
+	private void readExistingCodeFile(MultipartFile file){
+//		try(FileReader fr = new FileReader(file, true);
+//			BufferedReader br = new BufferedReader(fr);
+//			//PrintWriter out = new PrintWriter(bw);
+//		){
+//
+//			br.readLine();
+//			out.println(HEADERS);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
+
+	}
+
 
 	private Metadata formatMetadata(Metadata metadata){
 

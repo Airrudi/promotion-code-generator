@@ -3,9 +3,14 @@ package nl.ruudclaassen.jfall3.data;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import nl.ruudclaassen.jfall3.model.Code;
+import nl.ruudclaassen.jfall3.model.Participant;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -69,6 +74,35 @@ public class CodeFileRepository implements CodeRepository {
     		e.printStackTrace();
     		return false;
     	}
+	}
+
+	public void read(String fileName){
+
+        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+
+            // If file is successfully loaded, reset possible existing code
+            List<Code> codes = new ArrayList<>();
+
+            stream.forEach(s -> convertTextLineToCode(s, codes));
+
+        } catch (IOException e) {
+            // System.out.print("Het bestand is niet gevonden");
+            throw new RuntimeException("File not found");
+            // e.printStackTrace();
+        }
+	}
+
+	private void convertTextLineToCode(String textLine, List<Code> codes){
+		String[] textLineElements = textLine.split(",");
+
+		String name = textLineElements[0];
+		String codeCombination = textLineElements[1];
+		String email = textLineElements[2];
+
+		Participant participant = new Participant(name, email);
+		Code code = new Code(codeCombination, participant);
+
+		codes.add(code);
 	}
 	
 	
