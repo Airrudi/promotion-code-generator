@@ -12,10 +12,10 @@ import nl.ruudclaassen.jfall3.model.Metadata;
 
 
 @Component
-public class MetadataFileRepository implements MetadataRepository {
+public class MetadataFileDaoImpl implements MetadataDao {
 	
 	private static final String METAFILE = "metafile.csv";
-	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,winningCode";
+	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,numberOfParticipants,winningCode";
 
 	@Override
 	public Map<String, Metadata> load(){			
@@ -49,27 +49,26 @@ public class MetadataFileRepository implements MetadataRepository {
 		// TODO: Fix if text contains ,
 		String[] metadataArray = metadataLine.split(",");
 		
-		if(metadataArray.length < 6){
-			metadataArray = Arrays.copyOf(metadataArray,metadataArray.length + 1);
-		}		
-		
-		
+		if(metadataArray.length < 7){
+			metadataArray = Arrays.copyOf(metadataArray, 7);
+		}
+
 		// Create new metadata object which is added to the metadataList
-		Metadata metadata = new Metadata(metadataArray[0], metadataArray[1], metadataArray[2], metadataArray[3], Integer.parseInt(metadataArray[4]), metadataArray[5]);
+		Metadata metadata = new Metadata(metadataArray[0], metadataArray[1], metadataArray[2], metadataArray[3], Integer.parseInt(metadataArray[4]), Integer.parseInt(metadataArray[5]),  metadataArray[6]);
 		metadataMap.put(metadata.getId(), metadata);
 	}
 
 	@Override
-	public Metadata getMetadataById(String promoId){
+	public Metadata getMetadataById(String id){
 		Map<String, Metadata> metadataMap = this.load();		
-		return metadataMap.get(promoId);
+		return metadataMap.get(id);
 	}
 
 	@Override
-	public Map<String, Metadata> delete(String promoId){
+	public Map<String, Metadata> delete(String id){
 		Map<String, Metadata> metadataMap = new HashMap<>();
 		metadataMap = this.load();		
-		metadataMap.remove(promoId);
+		metadataMap.remove(id);
 		this.save(metadataMap);		
 		
 		// TODO: Check to see if something was removed?
@@ -81,14 +80,34 @@ public class MetadataFileRepository implements MetadataRepository {
 		try(FileWriter fileWriter = new FileWriter(METAFILE, true);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			PrintWriter printWriter = new PrintWriter(bufferedWriter);){
+
 			printWriter.println(metadata.toString());
+
 		} catch (IOException e) {
 			System.out.println("Error in file");
 		}
 
 		return metadata;
 	}
-	
+
+	@Override
+	public Map<String, Metadata> update(Metadata metadata) {
+		Map<String, Metadata> metadataMap = this.load();
+
+		// Keep some of the old values
+		Metadata oldMetadata = metadataMap.get(metadata.getId());
+		metadata.setCreationDate(oldMetadata.getCreationDate());
+
+		if(metadata.getNumberOfCodes() == 0) {
+			metadata.setNumberOfCodes(oldMetadata.getNumberOfCodes());
+		}
+
+		metadataMap.replace(metadata.getId(), metadata);
+		this.save(metadataMap);
+
+		return metadataMap;
+	}
+
 	public boolean save(Map<String, Metadata> metadataMap){
 
 		// Overwrites existing file

@@ -1,69 +1,174 @@
 package nl.ruudclaassen.jfall3.controller;
 
-import nl.ruudclaassen.jfall3.exceptions.InputValidationException;
-import nl.ruudclaassen.jfall3.services._MetadataService;
+import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Participant;
+import nl.ruudclaassen.jfall3.services.CodeService;
+import nl.ruudclaassen.jfall3.services.MetadataService;
+import nl.ruudclaassen.jfall3.services.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import nl.ruudclaassen.jfall3.model.Metadata;
-import nl.ruudclaassen.jfall3.services.CodeService;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Controller
 public class PromoController {
-	
-	@Autowired
-	private CodeService codeService;
 
-	@Autowired
-	private _MetadataService metadataService;
-	
-	@RequestMapping("/promo/new")
-	public String loadPage(ModelMap modelMap){
+    @Autowired
+    private MetadataService metadataService;
 
-		modelMap.put("metadata", new Metadata());
-		modelMap.put("newPromo", true);
+    @Autowired
+    private CodeService codeService;
 
-		return "promo-form";
-	}
-	
-	@RequestMapping(value = "/promo/new", method = RequestMethod.POST)
-	public String createPromo(Metadata metadata, ModelMap modelMap, @RequestParam MultipartFile file){
+    @Autowired
+    private ParticipantService participantService;
 
-		System.out.println(file);
-		
-		try{
-			codeService.save(metadata, file);
-			return "redirect:/promo/";
 
-		} catch(InputValidationException ive){
-			for(InputValidationException.Field field : ive.getFields()){
-				modelMap.put("error" + field.capitalize() , true);
-			}
+    @RequestMapping("/promo/")
+    public String load(ModelMap modelMap) {
 
-			modelMap.put("metadata", metadata);
-			modelMap.put("newPromo", true);
+        Map<String, Metadata> promotions = metadataService.load();
+        modelMap.put("promotions", promotions);
 
-			return "promo-form";
-		}
-	}
+        return "promotions";
+    }
 
-	@RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.GET)
-	public String editPromo(ModelMap modelMap, @PathVariable String id){
+    @RequestMapping(value = "/promo/", method = RequestMethod.POST)
+    public String delete(@RequestParam String promoId, ModelMap modelMap) {
 
-		// TODO: Q: How to work with the object in the form, instead of separate fields?
-		Metadata metadata = metadataService.getMetadataById(id);
+        // Returns map with remaining promotions
+        Map<String, Metadata> promotions = metadataService.delete(promoId);
+        modelMap.put("promotions", promotions);
 
-		modelMap.put("metadata", metadata);
-		//modelMap.put("new", false);
+        return "promotions";
+    }
 
-		return "promo-form";
-	}
+    @RequestMapping("/promo/new")
+    public String newPromo(ModelMap modelMap) {
+
+        modelMap.put("metadata", new Metadata());
+        modelMap.put("newPromo", true);
+        modelMap.put("edit", false);
+        modelMap.put("numberOfParticipants", 0);
+
+        return "promo-form";
+    }
+
+    @RequestMapping(value = "/promo/new", method = RequestMethod.POST)
+    public String savePromo(Metadata metadata, ModelMap modelMap, @RequestParam(required = false, name="uploadCodes") MultipartFile codeFile, @RequestParam(required = false, name="uploadParticipants") MultipartFile uploadParticipants, @RequestParam String generateOrUpload, @RequestParam(required=false) String registeredParticipants) {
+            String id = UUID.randomUUID().toString();
+            metadata.setId(id);
+
+        try {
+
+            metadataService.save(metadata);
+
+            if (generateOrUpload.equals("upload") && validFile("txt", codeFile)) {
+                codeService.save(metadata, codeFile.getInputStream());
+            } else {
+                codeService.save(metadata);
+            }
+
+            if (registeredParticipants != null && registeredParticipants.equals("1") && validFile("csv", uploadParticipants)) {
+                participantService.save(metadata, uploadParticipants.getInputStream());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/promo/";
+    }
+
+    @RequestMapping("/promo/{id}/edit")
+    public String getPromo(ModelMap modelMap, @PathVariable String id) {
+
+        Metadata metadata = metadataService.getMetadataById(id);
+        int numberOfParticipants = metadata.getNumberOfParticipants();
+        String winningCode = metadata.getWinningCode();
+
+        if(winningCode != null) {
+            Participant participant = participantService.getParticipantByCode(metadata);
+            modelMap.put("winner", participant.getName());
+        }
+
+        modelMap.put("winningCode", winningCode);
+        modelMap.put("metadata", metadata);
+        modelMap.put("edit", true);
+        modelMap.put("numberOfParticipants", numberOfParticipants);
+
+        return "promo-form";
+    }
+
+    @RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.POST)
+    public String editPromo(Metadata metadata, ModelMap modelMap, @RequestParam(required = false, name="uploadParticipants") MultipartFile participantFile, @RequestParam(required=false) String registeredParticipants) {
+
+        try {
+            metadataService.update(metadata);
+
+            if (registeredParticipants != null && registeredParticipants.equals("1") && validFile("csv", participantFile)) {
+                participantService.save(metadata, participantFile.getInputStream());
+                //ParticipantService.VALID_PARTICIPANTS_LIST;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/promo/";
+    }
+
+//		if(metadata.isImportRequest()){
+//			file.getContentType();
+//			file.
+//					participantService.save(metadata, );
+//
+//		} else {
+//				codeService.save(metadata);
+//		}
+//
+//		System.out.println(file);
+//
+//		file.transferTo();
+//
+//		try{
+//			codeService.save(metadata);
+//			return "redirect:/promo/";
+//
+//		} catch(InputValidationException ive){
+//			for(InputValidationException.Field field : ive.getFields()){
+//				modelMap.put("error" + field.capitalize() , true);
+//			}
+//
+//			modelMap.put("metadata", metadata);
+//			modelMap.put("newPromo", true);
+//
+//			return "promo-form";
+//		}
+    //}
+
+    private boolean validFile(String fileType, MultipartFile file) throws Exception {
+//        if (!file.getContentType().equals(fileType)) {
+//            throw new Exception("Incorrect fileType");
+//        }
+
+        if ((file.getSize() / 1024 > 1000)) {
+            throw new Exception("File is to big");
+        }
+
+        return true;
+    }
+
+
+
+
+
 }
 
 

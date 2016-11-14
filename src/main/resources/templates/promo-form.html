@@ -4,30 +4,59 @@
 		<meta charset="ISO-8859-1"/>
 		<title>Codes genereren</title>
 		<link rel="stylesheet" th:href="@{/style.css}" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	</head>
 	<body>
 		<h1>Codes genereren</h1>
 		
-		<form action="" method="POST" th:object="${metadata}" enctype="multipart/form-data">
+		<form action="" method="POST" enctype="multipart/form-data" th:object="${metadata}">
 			<fieldset th:classappend="${errorTitle} ? error">
 				<p th:if="${errorTitle}">Wat is de titel van de actie?</p>
-				<label for="title">Titel van de actie *</label>
+				<label class="label" for="title">Titel*</label>
 				<input id="title" th:field="*{title}"/>
 			</fieldset>
 			
 			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${newPromo}">
 				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
-				<label for="numberOfCodes">Aantal codes *</label>
-				<input id="numberOfCodes" th:field="*{numberOfCodes}"/>
+
+				<p class="label" >Codes</p>
+				<input id="generate" type="radio" name="generateOrUpload" value="generate" checked="checked"/><label for="generate">Genereren</label>
+				<input id="upload" type="radio" name="generateOrUpload" value="upload"/><label for="upload">Uploaden</label>
+
+				<div id="generateCodesContainer" class="action">
+					<label class="label" for="numberOfCodes">Aantal codes</label>
+					<input id="numberOfCodes" th:field="*{numberOfCodes}"/>
+				</div>
+
+				<div id="uploadCodesContainer" class="action" style="display:none;">
+					<input id="uploadCodes" name="uploadCodes" type="file" value=""/>
+				</div>
 			</fieldset>
 
 			<fieldset>
-				<label for="upload">Codes uploaden:</label>
-				<input id="upload" type="file" value=""/>
+				<p class="label">Deelnemers</p>
+				<div th:if="${numberOfParticipants == 0}">
+					<input id="notRegistered" type="radio" name="registeredParticipants" value="0" checked="checked" th:disabled="${!edit}"/><label for="notRegistered">Nee</label>
+					<input id="registered" type="radio" name="registeredParticipants" value="1" th:disabled="${!edit}"/><label for="registered">Ja</label>
+					<div id="uploadParticipantsContainer" class="action" style="display:none;">
+						<input id="uploadParticipants" name="uploadParticipants" type="file" value=""/>
+					</div>
+				</div>
+				<p th:if="${numberOfParticipants > 0}" th:inline="text">[[${numberOfParticipants}]]</p>
 			</fieldset>
-			
+
 			<fieldset>
-				<label for="note">Opmerkingen:</label>
+				<p class="label">Winnaar</p>
+				<div th:if="!${winningCode == null}">
+					<p th:inline="text">[[${winner + ' (' + winningCode + ')'}]]</p>
+				</div>
+				<div th:if="${winningCode == null}">
+					<p th:inline="text">Winnaar kiezen</p>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<label for="note" class="label" >Opmerkingen:</label>
 				<textarea id="note" th:field="*{note}"></textarea>
 			</fieldset>
 			
@@ -38,4 +67,37 @@
 		<a href="/promo/" class="button back">Terug naar overzicht</a>
 	
 	</body>
+
+	<script>
+
+		$(function(){
+
+			// Toggle visibility of the uploadCodesContainer
+			$("input:radio[name='generateOrUpload']").change(function(){
+				if(this.value == "upload"){
+					$("#generateCodesContainer").hide();
+					$("#uploadCodesContainer").show();
+					$("input:radio[name='registeredParticipants']").attr("disabled", false);
+				} else {
+					$("#generateCodesContainer").show();
+					$("#uploadCodesContainer").hide();
+
+					$("#notRegistered").prop("checked", true);
+					$("#registered").prop("checked", false);
+					$("#uploadParticipantsContainer").hide();
+					$("input:radio[name='registeredParticipants']").prop("disabled", true);
+				}
+			});
+
+			// Toggle visibility of the uploadCodesContainer
+			$("input:radio[name='registeredParticipants']").change(function(){
+				if(this.value == 1){
+					$("#uploadParticipantsContainer").show();
+				} else {
+					$("#uploadParticipantsContainer").hide();
+				}
+			});
+
+		});
+	</script>
 </html>

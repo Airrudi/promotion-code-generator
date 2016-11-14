@@ -33,7 +33,12 @@
 					<p class="value" th:text="${promo.value.numberOfCodes}"></p>
 					<!-- <a href="">Bekijk codes</a> -->
 				</li>
-				<li><p class="label">Winnende code:</p>
+				<li>
+					<p class="label">Aantal deelnemers:</p>
+					<p class="value" th:text="${promo.value.numberOfParticipants}"></p>
+					<!-- <a href="">Bekijk codes</a> -->
+				</li>
+				<li><p class="label">Winnaar</p>
 					<p th:if="${promo.value.winningCode != null}" class="value" th:text="${promo.value.winningCode}"></p>
 					<button th:if="${promo.value.winningCode == null}" class="button" th:onclick="'javascript:pickWinner(\''+ ${promo.key} + '\');'">Kies winnende code</button>
 					<button th:if="${promo.value.winningCode != null}" class="button back" th:onclick="'javascript:resetWinner(\''+ ${promo.key} + '\');'">Reset winnaar</button>

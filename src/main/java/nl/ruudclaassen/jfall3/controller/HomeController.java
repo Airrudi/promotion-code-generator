@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import nl.ruudclaassen.jfall3.model.Metadata;
-import nl.ruudclaassen.jfall3.services.CodeService;
+import nl.ruudclaassen.jfall3.services.CodeServiceImpl;
 
 
 @Controller
 public class HomeController {
 	
 	@Autowired
-	CodeService codeService;
+    CodeServiceImpl codeService;
 	
 	
 	@RequestMapping("/")
