@@ -23,8 +23,8 @@ public class CodeFileDaoImpl implements CodeDao {
 	}
 
 	@Override
-	public boolean save(String id, Set<String> codes) {
-		String fileName = buildFileName(id);
+	public boolean save(Metadata metadata, Set<String> codes) {
+		String fileName = buildFileName(metadata.getId());
 		File file = new File(fileName);
 
 		try(FileWriter fw = new FileWriter(file, true);
