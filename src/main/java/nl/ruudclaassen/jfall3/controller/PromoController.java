@@ -5,6 +5,7 @@ import nl.ruudclaassen.jfall3.model.Participant;
 import nl.ruudclaassen.jfall3.services.CodeService;
 import nl.ruudclaassen.jfall3.services.MetadataService;
 import nl.ruudclaassen.jfall3.services.ParticipantService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,136 +16,141 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
-import java.util.UUID;
 
+// TODO: CR: add comments to describe what the methods do 
+//TODO: CR introduce constants when you have to repeat a string variable a number of times.
 @Controller
 public class PromoController {
 
-    @Autowired
-    private MetadataService metadataService;
+	@Autowired
+	private MetadataService metadataService;
 
-    @Autowired
-    private CodeService codeService;
+	@Autowired
+	private CodeService codeService;
 
-    @Autowired
-    private ParticipantService participantService;
+	@Autowired
+	private ParticipantService participantService;
 
+	@RequestMapping("/promo/")
+	public String load(ModelMap modelMap) {
 
-    @RequestMapping("/promo/")
-    public String load(ModelMap modelMap) {
+		Map<String, Metadata> promotions = metadataService.load();
+		modelMap.put("promotions", promotions);
 
-        Map<String, Metadata> promotions = metadataService.load();
-        modelMap.put("promotions", promotions);
+		return "promotions";
+	}
 
-        return "promotions";
-    }
+	@RequestMapping(value = "/promo/", method = RequestMethod.POST)
+	public String delete(@RequestParam String promoId, ModelMap modelMap) {
 
-    @RequestMapping(value = "/promo/", method = RequestMethod.POST)
-    public String delete(@RequestParam String promoId, ModelMap modelMap) {
+		// Returns map with remaining promotions
+		// TODO: Q: Get metadata first or put promoId directly in method below?
 
-        // Returns map with remaining promotions
-        // TODO: Q: Get metadata first or put promoId directly in method below?
+		// TODO: CR: don't have the delete method return everything that is left as a side effect
+		Map<String, Metadata> promotions = metadataService.delete(promoId);
+		modelMap.put("promotions", promotions);
 
+		return "promotions";
+	}
 
-        Map<String, Metadata> promotions = metadataService.delete(promoId);
-        modelMap.put("promotions", promotions);
+	@RequestMapping("/promo/new")
+	public String newPromo(ModelMap modelMap) {
+		modelMap.put("metadata", new Metadata());
+		modelMap.put("newPromo", true);
+		modelMap.put("edit", false);
+		modelMap.put("numberOfParticipants", 0);
+		modelMap.put("title", "Nieuwe promotie");
 
-        return "promotions";
-    }
+		return "promo-form";
+	}
 
-    @RequestMapping("/promo/new")
-    public String newPromo(ModelMap modelMap) {
-        modelMap.put("metadata", new Metadata());
-        modelMap.put("newPromo", true);
-        modelMap.put("edit", false);
-        modelMap.put("numberOfParticipants", 0);
-        modelMap.put("title", "Nieuwe promotie");
+	@RequestMapping(value = "/promo/new", method = RequestMethod.POST)
+	public String savePromo(Metadata metadata, ModelMap modelMap,
+	        @RequestParam(required = false, name = "uploadCodes") MultipartFile codeFile,
+	        @RequestParam(required = false, name = "uploadParticipants") MultipartFile uploadParticipants,
+	        @RequestParam String generateOrUpload, @RequestParam(required = false) String registeredParticipants) {
 
-        return "promo-form";
-    }
+		try {
 
-    @RequestMapping(value = "/promo/new", method = RequestMethod.POST)
-    public String savePromo(Metadata metadata, ModelMap modelMap, @RequestParam(required = false, name="uploadCodes") MultipartFile codeFile, @RequestParam(required = false, name="uploadParticipants") MultipartFile uploadParticipants, @RequestParam String generateOrUpload, @RequestParam(required=false) String registeredParticipants) {
+			metadataService.save(metadata);
 
-        try {
+			// TODO: CR: use an enum rather than a string
+			if (generateOrUpload.equals("upload") && validFile("txt", codeFile)) {
+				codeService.save(metadata, codeFile.getInputStream());
+			} else {
+				codeService.save(metadata);
+			}
 
-            metadataService.save(metadata);
+			// TODO: CR: "1" is a magic number, it is unclear what is does and can lead to errors
+			if (registeredParticipants != null && registeredParticipants.equals("1")
+			        && validFile("csv", uploadParticipants)) {
+				participantService.save(metadata, uploadParticipants.getInputStream());
+			}
 
-            if (generateOrUpload.equals("upload") && validFile("txt", codeFile)) {
-                codeService.save(metadata, codeFile.getInputStream());
-            } else {
-                codeService.save(metadata);
-            }
+		} catch (Exception e) {
+			// TODO: CR: never catch java.lang.Exception and do not use printStackTrace. use logger
+			// instead
+			e.printStackTrace();
+		}
 
-            if (registeredParticipants != null && registeredParticipants.equals("1") && validFile("csv", uploadParticipants)) {
-                participantService.save(metadata, uploadParticipants.getInputStream());
-            }
+		return "redirect:/promo/";
+	}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	@RequestMapping("/promo/{id}/edit")
+	public String getPromo(ModelMap modelMap, @PathVariable String id) {
 
-        return "redirect:/promo/";
-    }
+		Metadata metadata = metadataService.getMetadataById(id);
+		int numberOfParticipants = metadata.getNumberOfParticipants();
+		Participant participant = metadata.getWinner();
 
-    @RequestMapping("/promo/{id}/edit")
-    public String getPromo(ModelMap modelMap, @PathVariable String id) {
+		// TODO: Check how thymeleaf deals with missing variables (if participant is null and does
+		// not exist in the modelmap)
+		if (participant != null) {
+			modelMap.put("winner", participant.getName());
+			modelMap.put("winningCode", participant.getCode());
+		}
 
-        Metadata metadata = metadataService.getMetadataById(id);
-        int numberOfParticipants = metadata.getNumberOfParticipants();
-        Participant participant = metadata.getWinner();
+		modelMap.put("title", "Promotie aanpassen");
+		modelMap.put("metadata", metadata);
+		modelMap.put("edit", true);
+		modelMap.put("numberOfParticipants", numberOfParticipants);
 
-        // TODO: Check how thymeleaf deals with missing variables (if participant is null and does not exist in the modelmap)
-        if(participant != null) {
-            modelMap.put("winner", participant.getName());
-            modelMap.put("winningCode", participant.getCode());
-        }
+		return "promo-form";
+	}
 
-        modelMap.put("title", "Promotie aanpassen");
-        modelMap.put("metadata", metadata);
-        modelMap.put("edit", true);
-        modelMap.put("numberOfParticipants", numberOfParticipants);
+	@RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.POST)
+	public String editPromo(Metadata metadata, ModelMap modelMap,
+	        @RequestParam(required = false, name = "uploadParticipants") MultipartFile participantFile,
+	        @RequestParam(required = false) String registeredParticipants) {
 
-        return "promo-form";
-    }
+		try {
+			metadataService.update(metadata);
 
-    @RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.POST)
-    public String editPromo(Metadata metadata, ModelMap modelMap, @RequestParam(required = false, name="uploadParticipants") MultipartFile participantFile, @RequestParam(required=false) String registeredParticipants) {
+			// TODO: CR: duplicated code
+			if (registeredParticipants != null && registeredParticipants.equals("1")
+			        && validFile("csv", participantFile)) {
+				participantService.save(metadata, participantFile.getInputStream());
+				// ParticipantService.VALID_PARTICIPANTS_LIST;
+			}
 
-        try {
-            metadataService.update(metadata);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-            if (registeredParticipants != null && registeredParticipants.equals("1") && validFile("csv", participantFile)) {
-                participantService.save(metadata, participantFile.getInputStream());
-                //ParticipantService.VALID_PARTICIPANTS_LIST;
-            }
+		return "redirect:/promo/";
+	}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	private boolean validFile(String fileType, MultipartFile file) throws Exception {
+		// if (!file.getContentType().equals(fileType)) {
+		// throw new Exception("Incorrect fileType");
+		// }
 
-        return "redirect:/promo/";
-    }
+		// TODO: CR: introduce a constant
+		if ((file.getSize() / 1024 > 1000)) {
+			throw new Exception("File is to big");
+		}
 
-
-    private boolean validFile(String fileType, MultipartFile file) throws Exception {
-//        if (!file.getContentType().equals(fileType)) {
-//            throw new Exception("Incorrect fileType");
-//        }
-
-        if ((file.getSize() / 1024 > 1000)) {
-            throw new Exception("File is to big");
-        }
-
-        return true;
-    }
-
-
-
-
+		return true;
+	}
 
 }
-
-
-
-

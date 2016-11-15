@@ -44,6 +44,7 @@ public class MetadataServiceImpl implements MetadataService {
         return metadataDao.update(metadata);
     }
 
+	// TODO: CR move this to a utilities class
     private String getFormattedDate() {
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

@@ -14,108 +14,110 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 import java.util.Map.Entry;
 
-
 @Service
 public class ParticipantServiceImpl implements ParticipantService {
 
-    @Autowired
-    ParticipantDao participantDao;
+	@Autowired
+	ParticipantDao participantDao;
 
-    @Autowired
-    CodeService codeService;
+	@Autowired
+	CodeService codeService;
 
-    @Autowired
-    WinnerService winnerService;
+	@Autowired
+	WinnerService winnerService;
 
-    @Autowired
-    MetadataService metadataService;
+	@Autowired
+	MetadataService metadataService;
 
-    @Override
-    public Map<String, Map<String, Participant>> save(Metadata metadata, InputStream inputParticipants) {
+	@Override
+	public Map<String, Map<String, Participant>> save(Metadata metadata, InputStream inputParticipants) {
 
-        Map<String, Map<String, Participant>> participantMap = new HashMap<>();
+		Map<String, Map<String, Participant>> participantMap = new HashMap<>();
 
-        try (InputStreamReader inputStreamReader = new InputStreamReader(inputParticipants);
-             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);) {
+		try (InputStreamReader inputStreamReader = new InputStreamReader(inputParticipants);
+		        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            Map<String, Participant> participants = new HashMap<>();
-            String line;
+			Map<String, Participant> participants = new HashMap<>();
+			String line;
 
-            // TODO: Better way to skip first line
-            bufferedReader.readLine();
+			// TODO: Better way to skip first line
+			bufferedReader.readLine();
 
-            while ((line = bufferedReader.readLine()) != null) {
-                String[] lineArray = line.split(",");
-                String id = UUID.randomUUID().toString();
-                Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
-                participants.put(participant.getId(), participant);
-            }
+			while ((line = bufferedReader.readLine()) != null) {
+				String[] lineArray = line.split(",");
+				String id = UUID.randomUUID().toString();
+				Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(),
+				        lineArray[2].trim());
+				participants.put(participant.getId(), participant);
+			}
 
-            participantMap = this.validateCodes(metadata, participants);
-            if (!participantMap.get("valid").isEmpty()) {
-                participantDao.save(metadata, participantMap.get("valid"));
-            }
+			participantMap = this.validateCodes(metadata, participants);
+			if (!participantMap.get("valid").isEmpty()) {
+				participantDao.save(metadata, participantMap.get("valid"));
+			}
 
-        } catch (FileAlreadyExistsException e) {
-            e.getFile();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+		} catch (FileAlreadyExistsException e) {
+			// TODO: CR this exception is swallowed and nothing is returned
+			e.getFile();
+		} catch (IOException ioe) {
+			// TODO: CR don't print stack traces
+			ioe.printStackTrace();
+		}
 
-        return participantMap;
-    }
+		return participantMap;
+	}
 
-    @Override
-    public Participant pickWinner(Metadata metadata) {
-        Map<String, Participant> participants = this.load(metadata);
-        Participant winningParticipant = winnerService.pickWinner(participants);
+	@Override
+	public Participant pickWinner(Metadata metadata) {
+		Map<String, Participant> participants = this.load(metadata);
+		Participant winningParticipant = winnerService.pickWinner(participants);
 
-        return winningParticipant;
-    }
+		return winningParticipant;
+	}
 
-    @Override
-    public Participant getParticipantById(Metadata metadata, String id) {
-        return participantDao.getParticipantById(metadata, id);
-    }
+	@Override
+	public Participant getParticipantById(Metadata metadata, String id) {
+		return participantDao.getParticipantById(metadata, id);
+	}
 
-    private Map<String, Map<String, Participant>> validateCodes(Metadata metadata, Map<String, Participant> participants) {
-        Set<String> generatedCodes = codeService.load(metadata);
-        Set<String> participantCodes = new HashSet<>();
-        boolean codeIsNew;
+	private Map<String, Map<String, Participant>> validateCodes(Metadata metadata, Map<String, Participant> participants) {
+		Set<String> generatedCodes = codeService.load(metadata);
+		Set<String> participantCodes = new HashSet<>();
+		boolean codeIsNew;
 
-        Map<String, Participant> validParticipants = new HashMap<>();
-        Map<String, Participant> invalidParticipants = new HashMap<>();
-        Map<String, Participant> participantDuplicateCode = new HashMap<>();
+		Map<String, Participant> validParticipants = new HashMap<>();
+		Map<String, Participant> invalidParticipants = new HashMap<>();
+		Map<String, Participant> participantDuplicateCode = new HashMap<>();
 
-        for (Entry<String, Participant> e: participants.entrySet()) {
-            String participantCode = e.getValue().getCode();
-            codeIsNew = participantCodes.add(participantCode);
+		for (Entry<String, Participant> e : participants.entrySet()) {
+			String participantCode = e.getValue().getCode();
+			codeIsNew = participantCodes.add(participantCode);
 
-            if (generatedCodes.contains(participantCode) && codeIsNew) {
-                validParticipants.put(e.getKey(), e.getValue());
-            } else {
-                invalidParticipants.put(e.getKey(), e.getValue());
-            }
+			if (generatedCodes.contains(participantCode) && codeIsNew) {
+				validParticipants.put(e.getKey(), e.getValue());
+			} else {
+				invalidParticipants.put(e.getKey(), e.getValue());
+			}
 
-            if (!codeIsNew) {
-                participantDuplicateCode.put(e.getKey(), e.getValue());
-            }
-        }
+			if (!codeIsNew) {
+				participantDuplicateCode.put(e.getKey(), e.getValue());
+			}
+		}
 
-        // Map of map of map of participants
-        Map<String, Map<String, Participant>> participantMap = new HashMap<>();
-        participantMap.put("valid", validParticipants);
-        participantMap.put("invalid", invalidParticipants);
-        participantMap.put("duplicate", participantDuplicateCode);
+		// Map of map of map of participants
+		Map<String, Map<String, Participant>> participantMap = new HashMap<>();
+		participantMap.put("valid", validParticipants);
+		participantMap.put("invalid", invalidParticipants);
+		participantMap.put("duplicate", participantDuplicateCode);
 
-        metadata.setNumberOfParticipants(validParticipants.size());
-        metadataService.update(metadata);
+		metadata.setNumberOfParticipants(validParticipants.size());
+		metadataService.update(metadata);
 
-        return participantMap;
-    }
+		return participantMap;
+	}
 
-    @Override
-    public Map<String, Participant> load(Metadata metadata) {
-        return participantDao.load(metadata);
-    }
+	@Override
+	public Map<String, Participant> load(Metadata metadata) {
+		return participantDao.load(metadata);
+	}
 }

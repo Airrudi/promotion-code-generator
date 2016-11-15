@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 
+// TODO: CR add comments to make it clear which method does what
+// TODO: CR introduce constants when you have to repeat a string variable a number of times.
 @Controller
 public class WinnerController {
 
@@ -44,6 +46,8 @@ public class WinnerController {
         metadata.setWinner(null);
         metadataService.update(metadata);
 
+        
+        // TODO: CR use Yoda conditions here
         if (caller != null && caller.equals("edit")) {
             return "redirect:/promo/" + id + "/edit";
         }

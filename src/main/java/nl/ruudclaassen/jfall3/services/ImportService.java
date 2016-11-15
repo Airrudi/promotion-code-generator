@@ -1,18 +1,10 @@
 package nl.ruudclaassen.jfall3.services;
 
-import nl.ruudclaassen.jfall3.model.Metadata;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
+// TODO: CR: this class doesn't do anything at the moment
 @Service
 public class ImportService {
 
