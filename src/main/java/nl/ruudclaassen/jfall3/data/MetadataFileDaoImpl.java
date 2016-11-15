@@ -80,10 +80,10 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	}
 
 	@Override
-	public Map<String, Metadata> delete(String id){
+	public Map<String, Metadata> delete(String promoId){
 		Map<String, Metadata> metadataMap = new HashMap<>();
 		metadataMap = this.load();		
-		metadataMap.remove(id);
+		metadataMap.remove(promoId);
 		this.save(metadataMap);		
 		
 		// TODO: Check to see if something was removed?

@@ -60,11 +60,9 @@ button:focus {outline:0;}
 fieldset{border: none; padding: 0; margin: 0;}
 .error p{color:red;}
 
-.spinnerButton{
-    font-size: 25px;
-    padding: 15px 30px;
+.spinnerButton{font-size: 25px;padding: 15px 30px;
     background-color: green;
-    border-radius: 10px;
+    border-radius: 6px;
     display: inline-block;
     margin: 0 auto;
 }

@@ -8,5 +8,5 @@ public interface MetadataDao {
 	public abstract Metadata save(Metadata metadata);
 	public abstract Map<String, Metadata> update(Metadata metadata);
 	public abstract Metadata getMetadataById(String id);
-	public abstract Map<String, Metadata> delete(String id);
+	public abstract Map<String, Metadata> delete(String promoId);
 }

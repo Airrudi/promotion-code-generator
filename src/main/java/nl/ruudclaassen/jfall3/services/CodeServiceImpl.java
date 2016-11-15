@@ -53,7 +53,7 @@ public class CodeServiceImpl implements CodeService {
 
 
     @Override
-    public Map<String, Metadata> delete(String promoId) {
+    public Map<String, Metadata> delete(Metadata metadata) {
         return null;
     }
 
@@ -149,11 +149,11 @@ public class CodeServiceImpl implements CodeService {
         }
     }
 
-    public Map<String, Metadata> remove(String promoId) {
+    public Map<String, Metadata> remove(Metadata metadata) {
         Map<String, Metadata> metadataMap = new HashMap<>();
 
-        codeDao.delete(promoId);
-        metadataMap = metadataDao.delete(promoId);
+        codeDao.delete(metadata);
+        metadataMap = metadataDao.delete(metadata.getId());
 
         return metadataMap;
     }

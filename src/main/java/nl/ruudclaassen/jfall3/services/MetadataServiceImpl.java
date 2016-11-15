@@ -27,8 +27,8 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public Map<String, Metadata> delete(String id) {
-        return metadataDao.delete(id);
+    public Map<String, Metadata> delete(String promoId) {
+        return metadataDao.delete(promoId);
     }
 
     @Override

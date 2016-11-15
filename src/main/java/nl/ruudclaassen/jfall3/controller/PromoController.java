@@ -43,6 +43,9 @@ public class PromoController {
     public String delete(@RequestParam String promoId, ModelMap modelMap) {
 
         // Returns map with remaining promotions
+        // TODO: Q: Get metadata first or put promoId directly in method below?
+
+
         Map<String, Metadata> promotions = metadataService.delete(promoId);
         modelMap.put("promotions", promotions);
 
@@ -123,34 +126,6 @@ public class PromoController {
         return "redirect:/promo/";
     }
 
-//		if(metadata.isImportRequest()){
-//			file.getContentType();
-//			file.
-//					participantService.save(metadata, );
-//
-//		} else {
-//				codeService.save(metadata);
-//		}
-//
-//		System.out.println(file);
-//
-//		file.transferTo();
-//
-//		try{
-//			codeService.save(metadata);
-//			return "redirect:/promo/";
-//
-//		} catch(InputValidationException ive){
-//			for(InputValidationException.Field field : ive.getFields()){
-//				modelMap.put("error" + field.capitalize() , true);
-//			}
-//
-//			modelMap.put("metadata", metadata);
-//			modelMap.put("newPromo", true);
-//
-//			return "promo-form";
-//		}
-    //}
 
     private boolean validFile(String fileType, MultipartFile file) throws Exception {
 //        if (!file.getContentType().equals(fileType)) {

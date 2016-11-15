@@ -7,3 +7,4 @@
 - Change the uploaded codes (overwriting existing input)
 - Change the uploaded participants (overwriting existing input)
 - Uploading codes and participants with additional buttons in edit mode, preventing the need to save twice
+- Feedback on uploads
