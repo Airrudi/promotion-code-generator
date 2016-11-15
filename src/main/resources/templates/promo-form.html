@@ -2,43 +2,64 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="ISO-8859-1"/>
-		<title>Codes genereren</title>
+		<title th:inline="text">[[${title}]]</title>
 		<link rel="stylesheet" th:href="@{/style.css}" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	</head>
 	<body>
-		<h1>Codes genereren</h1>
+		<h1 th:inline="text">[[${title}]]</h1>
+
+		<form id="resetWinnerForm" action="/set-dynamically/" method="POST">
+			<input id="resetWinnerId" name="resetWinnerId" type="hidden" value=""/>
+		</form>
+
+		<form id="winnerForm" action="set-dynamically/" method="POST">
+			<input id="winnerPromoId" name="promoId" type="hidden" value=""/>
+		</form>
 		
-		<form action="" method="POST" enctype="multipart/form-data" th:object="${metadata}">
+		<form id="promoForm" class="clearfix" action="" method="POST" enctype="multipart/form-data" th:object="${metadata}">
 			<fieldset th:classappend="${errorTitle} ? error">
 				<p th:if="${errorTitle}">Wat is de titel van de actie?</p>
 				<label class="label" for="title">Titel*</label>
-				<input id="title" th:field="*{title}"/>
+				<input id="title" type="text" th:field="*{title}"/>
 			</fieldset>
 			
 			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${newPromo}">
 				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
 
 				<p class="label" >Codes</p>
-				<input id="generate" type="radio" name="generateOrUpload" value="generate" checked="checked"/><label for="generate">Genereren</label>
-				<input id="upload" type="radio" name="generateOrUpload" value="upload"/><label for="upload">Uploaden</label>
-
-				<div id="generateCodesContainer" class="action">
-					<label class="label" for="numberOfCodes">Aantal codes</label>
-					<input id="numberOfCodes" th:field="*{numberOfCodes}"/>
+				<div id="codes" class="radioContainer">
+					<input id="generate" type="radio" name="generateOrUpload" value="generate" checked="checked"/><label for="generate">Genereren</label>
+					<input id="upload" type="radio" name="generateOrUpload" value="upload"/><label for="upload">Uploaden</label>
 				</div>
 
-				<div id="uploadCodesContainer" class="action" style="display:none;">
+				<div id="generateCodesContainer" class="subChoice">
+					<label class="label extra" for="numberOfCodes">Aantal codes</label>
+					<input id="numberOfCodes" type="number" th:field="*{numberOfCodes}"/>
+				</div>
+
+				<div id="uploadCodesContainer" class="subChoice" style="display:none;">
+					<label class="label extra" for="numberOfCodes">Uploaden</label>
 					<input id="uploadCodes" name="uploadCodes" type="file" value=""/>
 				</div>
+			</fieldset>
+
+			<fieldset th:if="${metadata.getNumberOfCodes() &gt; 0}">
+				<p class="label" >Aantal codes</p>
+				<p th:text="${metadata.getNumberOfCodes()}"></p>
+
 			</fieldset>
 
 			<fieldset>
 				<p class="label">Deelnemers</p>
 				<div th:if="${numberOfParticipants == 0}">
-					<input id="notRegistered" type="radio" name="registeredParticipants" value="0" checked="checked" th:disabled="${!edit}"/><label for="notRegistered">Nee</label>
-					<input id="registered" type="radio" name="registeredParticipants" value="1" th:disabled="${!edit}"/><label for="registered">Ja</label>
-					<div id="uploadParticipantsContainer" class="action" style="display:none;">
+					<div class="radioContainer">
+						<input id="notRegistered" type="radio" name="registeredParticipants" value="0" checked="checked" th:disabled="${!edit}"/><label for="notRegistered">Nee</label>
+						<input id="registered" type="radio" name="registeredParticipants" value="1" th:disabled="${!edit}"/><label for="registered">Ja</label>
+					</div>
+
+					<div id="uploadParticipantsContainer" class="subChoice" style="display:none;">
+						<label class="label extra" for="uploadParticipants">Uploaden</label>
 						<input id="uploadParticipants" name="uploadParticipants" type="file" value=""/>
 					</div>
 				</div>
@@ -49,10 +70,15 @@
 				<p class="label">Winnaar</p>
 				<div th:if="!${winningCode == null}">
 					<p th:inline="text">[[${winner + ' (' + winningCode + ')'}]]</p>
+					<button type="button" class="reset" th:onclick="'javascript:resetWinner(\''+ ${metadata.getId()} + '\');'">Reset winnaar</button>
 				</div>
-				<div th:if="${winningCode == null}">
-					<p th:inline="text">Winnaar kiezen</p>
+				<div th:if="${winningCode == null and numberOfParticipants &gt; 0}">
+					<button type="button" class="button winner" th:onclick="'javascript:pickWinner(\''+ ${metadata.getId()} + '\');'">Kies winnende code</button>
 				</div>
+				<div th:if="${numberOfParticipants == 0}">
+					<p>Voeg deelnemers toe om een winnaar te kiezen</p>
+				</div>
+
 			</fieldset>
 
 			<fieldset>
@@ -60,11 +86,15 @@
 				<textarea id="note" th:field="*{note}"></textarea>
 			</fieldset>
 			
-			<input class="button" type="submit" value="Opslaan"/>
+			<input class="button save" type="submit" value="Opslaan"/>
 		</form>
+
+		<div class="buttonContainer bottom">
+			<a href="/" class="button back">Terug naar home</a>
+			<a href="/promo/" class="button back">Terug naar overzicht</a>
+		</div>
 		
-		<a href="/" class="button back">Terug naar home</a>
-		<a href="/promo/" class="button back">Terug naar overzicht</a>
+
 	
 	</body>
 
@@ -99,5 +129,18 @@
 			});
 
 		});
+
+		function resetWinner(promoId){
+			document.getElementById("resetWinnerId").value = promoId;
+			document.getElementById("resetWinnerForm").action = "/promo/" + promoId + "/winner/reset?caller=edit";
+			document.getElementById("resetWinnerForm").submit();
+		}
+
+		function pickWinner(promoId){
+			document.getElementById("winnerPromoId").value = promoId;
+			document.getElementById("winnerForm").action = "/promo/" + promoId + "/winner/";
+			document.getElementById("winnerForm").submit();
+		}
 	</script>
 </html>
+

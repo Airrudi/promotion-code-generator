@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import nl.ruudclaassen.jfall3.model.Metadata;
 import nl.ruudclaassen.jfall3.model.Participant;
 import org.springframework.stereotype.Component;
 
@@ -42,8 +43,8 @@ public class CodeFileDaoImpl implements CodeDao {
 		}
 	}
 
-	public Set<String> load(String id){
-		String fileName = buildFileName(id);		
+	public Set<String> load(Metadata metadata){
+		String fileName = buildFileName(metadata.getId());
 		Set<String> codes = new HashSet<>();		
 		
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {	

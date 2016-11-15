@@ -33,7 +33,7 @@ public class ParticipantServiceImplTest {
     @Before
     public void setUp() throws Exception {
         Set<String> codes = new HashSet<>(Arrays.asList("1234", "5678", "9012", "3456"));
-        when(codeService.load("id")).thenReturn(codes);
+        when(codeService.load(metadata)).thenReturn(codes);
     }
 
     private Metadata metadata;
@@ -45,11 +45,10 @@ public class ParticipantServiceImplTest {
 
     @Test
     public void emptyParticipantListWillNotGetSaved() throws Exception {
-        metadata = new Metadata();
-        metadata.setId("id");
+        metadata = new Metadata("id");
 
-        Map<String, Set<Participant>> returnMap = participantService.save(metadata, new ClassPathResource("emptyParticipants.csv").getInputStream());
-        verify(codeService, times(1)).load("id");
+        Map<String, Map<String, Participant>> returnMap = participantService.save(metadata, new ClassPathResource("emptyParticipants.csv").getInputStream());
+        verify(codeService, times(1)).load(metadata);
 
         assertEquals(3, returnMap.size());
         assertEquals(0, returnMap.get(participantService.VALID_PARTICIPANTS_LIST).size());
@@ -59,11 +58,10 @@ public class ParticipantServiceImplTest {
 
     @Test
     public void duplicateParticipantListWillBeFiltered() throws Exception {
-        metadata = new Metadata();
-        metadata.setId("id");
+        metadata = new Metadata("id");
 
-        Map<String, Set<Participant>> returnMap = participantService.save(metadata, new ClassPathResource("duplicateCodeParticipants.csv").getInputStream());
-        verify(codeService, times(1)).load("id");
+        Map<String, Map<String, Participant>> returnMap = participantService.save(metadata, new ClassPathResource("duplicateCodeParticipants.csv").getInputStream());
+        verify(codeService, times(1)).load(metadata);
         verify(participantDao, times(1)).save(metadata, returnMap.get(participantService.VALID_PARTICIPANTS_LIST));
 
         assertEquals(3, returnMap.size());
@@ -74,11 +72,10 @@ public class ParticipantServiceImplTest {
 
     @Test
     public void invalidParticipantCodesWillBeFiltered() throws Exception {
-        metadata = new Metadata();
-        metadata.setId("id");
+        metadata = new Metadata("id");
 
-        Map<String, Set<Participant>> returnMap = participantService.save(metadata, new ClassPathResource("invalidCodeParticipants.csv").getInputStream());
-        verify(codeService, times(1)).load("id");
+        Map<String, Map<String, Participant>> returnMap = participantService.save(metadata, new ClassPathResource("invalidCodeParticipants.csv").getInputStream());
+        verify(codeService, times(1)).load(metadata);
         verify(participantDao, times(1)).save(metadata, returnMap.get(participantService.VALID_PARTICIPANTS_LIST));
 
         assertEquals(3, returnMap.size());

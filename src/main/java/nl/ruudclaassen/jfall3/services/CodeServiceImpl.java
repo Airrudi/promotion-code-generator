@@ -59,7 +59,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     public void save(Metadata metadata, InputStream codeStream) {
-        List<String> codes = new ArrayList<>();
+        Set<String> codes = new HashSet<>();
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(codeStream);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader);) {
@@ -75,6 +75,7 @@ public class CodeServiceImpl implements CodeService {
             // TODO: Q: Validate codes (numbers and letters, 10 characters long)? Not a real problem since we check participants by same list..
             metadata.setNumberOfCodes(codes.size());
             metadataService.update(metadata);
+            codeDao.save(metadata.getId(), codes);
 
         } catch (FileAlreadyExistsException e) {
             e.getFile();
@@ -158,8 +159,8 @@ public class CodeServiceImpl implements CodeService {
     }
 
     @Override
-    public Set<String> load(String id){
-        return codeDao.load(id);
+    public Set<String> load(Metadata metadata){
+        return codeDao.load(metadata);
     }
 
 

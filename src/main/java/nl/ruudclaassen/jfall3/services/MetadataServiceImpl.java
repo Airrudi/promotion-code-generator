@@ -33,9 +33,9 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void save(Metadata metadata) {
-        metadata.setId(UUID.randomUUID().toString());
+        String id = UUID.randomUUID().toString();
+        metadata.setId(id);
         metadata.setCreationDate(getFormattedDate());
-
         metadataDao.save(metadata);
     }
 

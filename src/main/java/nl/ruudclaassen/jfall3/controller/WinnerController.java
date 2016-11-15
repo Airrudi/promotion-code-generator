@@ -38,11 +38,15 @@ public class WinnerController {
     }
 
     @RequestMapping("promo/{id}/winner/reset")
-    public String resetWinner(@PathVariable String id, ModelMap modelMap) {
+    public String resetWinner(@PathVariable String id, @RequestParam(value = "caller", required = false) String caller, ModelMap modelMap) {
 
         Metadata metadata = metadataService.getMetadataById(id);
-        metadata.setWinningCode(null);
+        metadata.setWinner(null);
         metadataService.update(metadata);
+
+        if (caller != null && caller.equals("edit")) {
+            return "redirect:/promo/" + id + "/edit";
+        }
 
         return "redirect:/promo/";
     }
@@ -82,7 +86,7 @@ public class WinnerController {
         Participant participant = participantService.pickWinner(metadata);
 
         // Update metadata with winning code
-        metadata.setWinningCode(participant.getCode());
+        metadata.setWinner(participant);
         metadataService.update(metadata);
 
         modelMap.put("metadata", metadata);

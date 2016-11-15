@@ -51,19 +51,17 @@ public class PromoController {
 
     @RequestMapping("/promo/new")
     public String newPromo(ModelMap modelMap) {
-
         modelMap.put("metadata", new Metadata());
         modelMap.put("newPromo", true);
         modelMap.put("edit", false);
         modelMap.put("numberOfParticipants", 0);
+        modelMap.put("title", "Nieuwe promotie");
 
         return "promo-form";
     }
 
     @RequestMapping(value = "/promo/new", method = RequestMethod.POST)
     public String savePromo(Metadata metadata, ModelMap modelMap, @RequestParam(required = false, name="uploadCodes") MultipartFile codeFile, @RequestParam(required = false, name="uploadParticipants") MultipartFile uploadParticipants, @RequestParam String generateOrUpload, @RequestParam(required=false) String registeredParticipants) {
-            String id = UUID.randomUUID().toString();
-            metadata.setId(id);
 
         try {
 
@@ -91,14 +89,15 @@ public class PromoController {
 
         Metadata metadata = metadataService.getMetadataById(id);
         int numberOfParticipants = metadata.getNumberOfParticipants();
-        String winningCode = metadata.getWinningCode();
+        Participant participant = metadata.getWinner();
 
-        if(winningCode != null) {
-            Participant participant = participantService.getParticipantByCode(metadata);
+        // TODO: Check how thymeleaf deals with missing variables (if participant is null and does not exist in the modelmap)
+        if(participant != null) {
             modelMap.put("winner", participant.getName());
+            modelMap.put("winningCode", participant.getCode());
         }
 
-        modelMap.put("winningCode", winningCode);
+        modelMap.put("title", "Promotie aanpassen");
         modelMap.put("metadata", metadata);
         modelMap.put("edit", true);
         modelMap.put("numberOfParticipants", numberOfParticipants);

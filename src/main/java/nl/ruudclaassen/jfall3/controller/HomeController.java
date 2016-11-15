@@ -31,18 +31,18 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value = "/", method = RequestMethod.POST)		
-	public String choosePromo(HttpSession session, @RequestParam String promoId, ModelMap modelMap){		
-		
-		// Get the chosen metadata object
-		Metadata metadata = codeService.getMetadataById(promoId);
-		
-		// Show if winningCode already exists (front end effects)
-		modelMap.put("winningCode", metadata.getWinningCode());
-		modelMap.put("title", metadata.getTitle());	
-		
-		return "home";
-	}
+//	@RequestMapping(value = "/", method = RequestMethod.POST)
+//	public String choosePromo(HttpSession session, @RequestParam String promoId, ModelMap modelMap){
+//
+//		// Get the chosen metadata object
+//		Metadata metadata = codeService.getMetadataById(promoId);
+//
+//		// Show if winningCode already exists (front end effects)
+//		modelMap.put("winningCode", metadata.getWinner().getCode(););
+//		modelMap.put("title", metadata.getTitle());
+//
+//		return "home";
+//	}
 	
 	
 	

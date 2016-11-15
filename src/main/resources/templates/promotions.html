@@ -6,9 +6,6 @@
 <link rel="stylesheet" th:href="@{/style.css}" />
 </head>
 <body>
-	<h1>Codes laden</h1>	
-	
-	
 	<form id="winnerForm" action="set-dynamically/" method="POST">
 		<input id="winnerPromoId" name="promoId" type="hidden" value=""/>
 	</form>
@@ -20,6 +17,10 @@
 	<form id="deleteForm" action="" method="POST">	
 		<input id="deletePromoId" name="promoId" type="hidden" value=""/>
 	</form>
+
+	<h1>Promoties</h1>
+	<a href="/promo/new" class="action new button"></a>
+
 	
 	<div id="promotionContainer">
 		<div class="promotion" th:each="promo : ${promotions}">
@@ -38,20 +39,23 @@
 					<p class="value" th:text="${promo.value.numberOfParticipants}"></p>
 					<!-- <a href="">Bekijk codes</a> -->
 				</li>
-				<li><p class="label">Winnaar</p>
-					<p th:if="${promo.value.winningCode != null}" class="value" th:text="${promo.value.winningCode}"></p>
-					<button th:if="${promo.value.winningCode == null}" class="button" th:onclick="'javascript:pickWinner(\''+ ${promo.key} + '\');'">Kies winnende code</button>
-					<button th:if="${promo.value.winningCode != null}" class="button back" th:onclick="'javascript:resetWinner(\''+ ${promo.key} + '\');'">Reset winnaar</button>
+				<li><p class="label">Winnaar:</p>
+					<p th:if="${promo.value.winner != null}" class="value" th:inline="text">[[${promo.value.winner.getName() + ' (' + promo.value.winner.getCode() + ')'}]]</p>
+					<button th:if="${promo.value.winner == null and promo.value.numberOfParticipants &gt; 0}" class="button winner" th:onclick="'javascript:pickWinner(\''+ ${promo.key} + '\');'">Kies winnende code</button>
+					<p th:if="${promo.value.numberOfParticipants == 0}">Voeg eerst deelnemers toe om een winnaar te kiezen</p>
+					<button th:if="${promo.value.winner != null}" class="reset" th:onclick="'javascript:resetWinner(\''+ ${promo.key} + '\');'">Reset winnaar</button>
 				</li>
 			</ul>
 
-			<p class="note" th:text="${promo.value.note}"></p>
-			<button class="delete button" th:text="Verwijderen" th:onclick="'javascript:deletePromo(\''+ ${promo.key} + '\');'"></button>
+			<button class="delete action button" th:onclick="'javascript:deletePromo(\''+ ${promo.key} + '\');'"></button>
 		</div>
 	</div>
+
+	<div class="buttonContainer bottom">
+		<a href="/" class="button back">Terug naar home</a>
+	</div>
 	
-	<a href="/" class="button back">Terug naar home</a>
-	<a href="/promo/new" class="button new">Nieuwe actie aanmaken</a>
+
 	
 	<script>
 		function pickWinner(promoId){		

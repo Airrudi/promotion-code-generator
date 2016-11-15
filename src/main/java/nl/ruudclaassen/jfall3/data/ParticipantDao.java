@@ -11,8 +11,8 @@ import java.util.Set;
 public interface ParticipantDao {
     Map<String, Participant> delete();
 
-    void save(Metadata metadata, Set<Participant> participantList) throws FileAlreadyExistsException;
+    void save(Metadata metadata, Map<String, Participant> participantList) throws FileAlreadyExistsException;
 
-    Set<Participant> load(String promoId);
-    Participant getParticipantByCode(Metadata metadata);
+    Map<String, Participant> load(Metadata metadata);
+    Participant getParticipantById(Metadata metadata, String id);
 }

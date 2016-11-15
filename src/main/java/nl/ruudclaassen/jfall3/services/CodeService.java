@@ -11,6 +11,6 @@ public interface CodeService {
     public abstract Map<String, Metadata> delete(String promoId);
     public abstract void save(Metadata metadata, InputStream inputStream);
     public abstract void save(Metadata metadata);
-    public Set<String> load(String id);
+    public Set<String> load(Metadata metadata);
     Metadata getMetadataById(String promoId);
 }

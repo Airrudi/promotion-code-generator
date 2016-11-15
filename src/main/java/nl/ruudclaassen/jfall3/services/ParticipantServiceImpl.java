@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
+import java.util.Map.Entry;
 
 
 @Service
@@ -30,14 +31,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     MetadataService metadataService;
 
     @Override
-    public Map<String, Set<Participant>> save(Metadata metadata, InputStream inputParticipants) {
+    public Map<String, Map<String, Participant>> save(Metadata metadata, InputStream inputParticipants) {
 
-        Map<String, Set<Participant>> participantMap = new HashMap<>();
+        Map<String, Map<String, Participant>> participantMap = new HashMap<>();
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(inputParticipants);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader);) {
 
-            Set<Participant> participants = new HashSet<>();
+            Map<String, Participant> participants = new HashMap<>();
             String line;
 
             // TODO: Better way to skip first line
@@ -45,8 +46,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
             while ((line = bufferedReader.readLine()) != null) {
                 String[] lineArray = line.split(",");
-                Participant participant = new Participant(lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
-                participants.add(participant);
+                String id = UUID.randomUUID().toString();
+                Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
+                participants.put(participant.getId(), participant);
             }
 
             participantMap = this.validateCodes(metadata, participants);
@@ -65,48 +67,43 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public Participant pickWinner(Metadata metadata) {
-        String promoId = metadata.getId();
-
-        //Set<String> codes = this.load(promoId);
-        Set<Participant> participants = this.load(promoId);
-        Participant winningParticipant= winnerService.pickWinner(participants);
-
-//        metadata.setWinningCode(winningParticipant.getCode());
-//        metadataService.save(metadata);
+        Map<String, Participant> participants = this.load(metadata);
+        Participant winningParticipant = winnerService.pickWinner(participants);
 
         return winningParticipant;
     }
 
     @Override
-    public Participant getParticipantByCode(Metadata metadata) {
-        return participantDao.getParticipantByCode(metadata);
+    public Participant getParticipantById(Metadata metadata, String id) {
+        return participantDao.getParticipantById(metadata, id);
     }
 
-    private Map<String, Set<Participant>> validateCodes(Metadata metadata, Set<Participant> participants) {
-        Set<String> generatedCodes = codeService.load(metadata.getId());
+    private Map<String, Map<String, Participant>> validateCodes(Metadata metadata, Map<String, Participant> participants) {
+        Set<String> generatedCodes = codeService.load(metadata);
         Set<String> participantCodes = new HashSet<>();
         boolean codeIsNew;
 
-        Set<Participant> validParticipants = new HashSet<>();
-        Set<Participant> invalidParticipants = new HashSet<>();
-        Set<Participant> participantDuplicateCode = new HashSet<>();
+        Map<String, Participant> validParticipants = new HashMap<>();
+        Map<String, Participant> invalidParticipants = new HashMap<>();
+        Map<String, Participant> participantDuplicateCode = new HashMap<>();
 
-        for (Participant participant : participants) {
-            String participantCode = participant.getCode();
+        for (Entry<String, Participant> e: participants.entrySet()) {
+            String participantCode = e.getValue().getCode();
             codeIsNew = participantCodes.add(participantCode);
 
             if (generatedCodes.contains(participantCode) && codeIsNew) {
-                validParticipants.add(participant);
+                validParticipants.put(e.getKey(), e.getValue());
             } else {
-                invalidParticipants.add(participant);
+                invalidParticipants.put(e.getKey(), e.getValue());
             }
 
             if (!codeIsNew) {
-                participantDuplicateCode.add(participant);
+                participantDuplicateCode.put(e.getKey(), e.getValue());
             }
         }
 
-        Map<String, Set<Participant>> participantMap = new HashMap<>();
+        // Map of map of map of participants
+        Map<String, Map<String, Participant>> participantMap = new HashMap<>();
         participantMap.put("valid", validParticipants);
         participantMap.put("invalid", invalidParticipants);
         participantMap.put("duplicate", participantDuplicateCode);
@@ -118,8 +115,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Set<Participant> load(String promoId) {
-        return participantDao.load(promoId);
+    public Map<String, Participant> load(Metadata metadata) {
+        return participantDao.load(metadata);
     }
-
 }

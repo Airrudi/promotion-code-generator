@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 @Component
@@ -21,7 +22,7 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
     }
 
     @Override
-    public void save(Metadata metadata, Set<Participant> participantList) {
+    public void save(Metadata metadata, Map<String, Participant> participantMap) {
         // TODO: Check if file already exists?
         String fileName = buildFileName(metadata.getId());
         File file = new File(fileName);
@@ -31,7 +32,11 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
             writer.println(HEADERS);
 
             // Print the entries
-            participantList.forEach((participant)->writer.println(participant));
+            for(Entry<String, Participant> e : participantMap.entrySet()) {
+                writer.println(e.getValue());
+            }
+
+            //participantMap.forEach((participant)->writer.println(participant));
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -44,34 +49,20 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
         return "participant-" + id + ".csv";
     }
 
-    private void buildParticipantList(String line, Set<Participant> participants){
+    private void buildParticipantMap(String line, Map<String, Participant> participants){
         String[] lineArray = line.split(",");
-        Participant participant = new Participant(lineArray[0], lineArray[1], lineArray[2]);
-        participants.add(participant);
+        Participant participant = new Participant(lineArray[0], lineArray[1], lineArray[2], lineArray[3]);
+        participants.put(participant.getId(), participant);
     }
 
     @Override
-    public Participant getParticipantByCode(Metadata metadata) {
-        Set<Participant> participants = this.load(metadata.getId());
-        String code = metadata.getWinningCode();
-
-        for(Participant participant : participants){
-            if(participant.getCode().equals(code)){
-                return participant;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public Set<Participant> load(String promoId) {
-        Set<Participant> participants = new HashSet<>();
-        String fileName = buildFileName(promoId);
+    public Map<String, Participant> load(Metadata metadata) {
+        Map<String, Participant> participants = new HashMap<>();
+        String fileName = buildFileName(metadata.getId());
 
         System.out.println("Start reading ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-            stream.skip(1).forEach(s -> buildParticipantList(s, participants));
+            stream.skip(1).forEach(s -> buildParticipantMap(s, participants));
         } catch (IOException e) {
             System.out.println("Failed to read ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
             System.out.println("Returning empty list of participants");
@@ -79,5 +70,11 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
         } finally{
             return participants;
         }
+    }
+
+    @Override
+    public Participant getParticipantById(Metadata metadata, String id) {
+        Map<String, Participant> participantMap = this.load(metadata);
+        return participantMap.get(id);
     }
 }

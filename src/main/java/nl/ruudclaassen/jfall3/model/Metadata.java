@@ -13,18 +13,23 @@ public class Metadata {
 	@NotNull
 	private int numberOfCodes;
     private int numberOfParticipants;
-	private String winningCode;
+	private Participant winner;
 
-	public Metadata(){}
+    // TODO: Q: Why is default constructor required here? Removing it will cause an error
+    public Metadata(){}
 
-    public Metadata(String id, String title, String note, String creationDate, int numberOfCodes, int numberOfParticipants, String winningCode) {
+    public Metadata(String id) {
+        this.id = id;
+    }
+
+    public Metadata(String id, String title, String note, String creationDate, int numberOfCodes, int numberOfParticipants, Participant winner) {
         this.id = id;
         this.title = title;
         this.note = note;
         this.creationDate = creationDate;
         this.numberOfCodes = numberOfCodes;
         this.numberOfParticipants = numberOfParticipants;
-        this.winningCode = winningCode;
+        this.winner = winner;
     }
 
     public String getId() {
@@ -75,12 +80,12 @@ public class Metadata {
         this.numberOfParticipants = numberOfParticipants;
     }
 
-    public String getWinningCode() {
-        return winningCode;
+    public Participant getWinner() {
+        return winner;
     }
 
-    public void setWinningCode(String winningCode) {
-        this.winningCode = winningCode;
+    public void setWinner(Participant winner) {
+        this.winner = winner;
     }
 
     @Override
@@ -89,8 +94,8 @@ public class Metadata {
 		String stringOutput = this.getId() + "," + this.getTitle() + "," + this.getNote() + "," + this.getCreationDate() + "," + this.getNumberOfCodes() + "," + this.getNumberOfParticipants();
 		
 		// Prevent writing "null" as string output to the end of the line
-		if(this.getWinningCode() != null){
-			 stringOutput += "," + this.getWinningCode();
+		if(this.getWinner() != null){
+			 stringOutput += "," + this.winner.getId();
 		}
 		
 		return stringOutput;

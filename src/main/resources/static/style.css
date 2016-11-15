@@ -1,9 +1,39 @@
 @CHARSET "ISO-8859-1";
 
-body{background-color:#efefef; font-family:sans-serif; width:750px; margin:0 auto;}
+@import url('https://fonts.googleapis.com/css?family=PT+Sans');
+*{margin:0; padding:0; border:0; font-size:15px; font-family:'PT sans';}
+
+body{background-color:#efefef; font-family:sans-serif; width:750px; margin:0 auto; margin-top:50px; position:relative;}
+h1{margin-bottom:40px; font-size:35px; border-bottom:1px solid #000; padding-bottom:12px;}
 p{font-size:15px;}
-*{margin:0; padding:0; border:0;}
-a{text-decoration:none;}
+a{text-decoration:none; color:#000;}
+
+#teaser h1{border:none;}
+
+/* FORM DESIGN */
+#promoForm{
+    padding: 30px 25px;
+    background-color: #fff;
+    border-radius: 15px;
+}
+input[type="text"], input[type="number"], textarea{border:1px solid rgba(128,128,128, .4); border-radius:2px; padding:8px 10px; font-size:15px; width:300px;}
+input[type="text"]{padding:8px 10px;}
+input[type="number"]{width:50px;}
+input[type="radio"]{margin-right:4px;}
+input[type="radio"] + label{margin-right:15px;}
+input[type="file"]{padding:4px 0;}
+textarea{resize: none; width:300px;}
+.label{padding:8px 0;}
+.label.extra{font-style:italic;}
+ul li .label{padding:3px 0;}
+
+.radioContainer{padding:8px 0;}
+.radioContainer input:first-child{padding-left:10px;}
+#codes{margin-bottom:10px;}
+
+#ezslots2 .window .content{font-size:65px !important;}
+
+form p{padding:8px 0; display:inline-block;}
 
 .page{width:75%; max-width:800px; margin:0 auto; text-align:center; padding:50px 0;}
 
@@ -16,26 +46,61 @@ a{text-decoration:none;}
 
 /* Home */
 #buttonContainer{margin-top:50px;}
-.button{transition:.2s; cursor:pointer; background-color:#137fbf; font-size:16px; color:#fff; padding:10px 12px; border-radius:5px; display:inline-block; position:relative; z-index:10;}
+.button{transition:.2s; cursor:pointer; background-color:#137fbf; color:#fff; padding:10px 22px; border-radius:5px; display:inline-block; position:relative; z-index:10;}
 .button:hover{opacity:.7;}
+.buttonContainer.top{margin-bottom:30px;}
+.buttonContainer.bottom{margin-top:30px;}
 .button.new{background-color:green;}
 .button.back{background-color:#7e7e7e;}
+.button.save{float:right;}
+.reset{background-color:transparent; color: red; text-decoration: underline; margin-left:15px; transition:.2s; cursor:pointer; position: relative; z-index: 5;}
+.reset:hover{color:#b22323;}
+button:focus {outline:0;}
 
 fieldset{border: none; padding: 0; margin: 0;}
 .error p{color:red;}
 
 .spinnerButton{
     font-size: 25px;
-    padding: 25px 35px;
+    padding: 15px 30px;
     background-color: green;
     border-radius: 10px;
     display: inline-block;
     margin: 0 auto;
 }
 
-#promotionContainer .promotion{display:block; padding:25px; margin:20px 0; border-radius:10px; background-color:#fff; transition:.2s; position:relative;}
-#promotionContainer .promotion .promoLink{width:100%; height:100%; position:absolute; top:0; left:0;}
-#promotionContainer .promotion .delete{background-color:#bf1313;  font-size:16px; position:absolute; right:25px; top:50%; transform:translateY(-50%); }
+.promotion{border:1px solid #fff; transition:.2s; display:block; padding:25px; margin:20px 0; border-radius:10px; background-color:#fff; transition:.2s; position:relative;}
+.promotion:hover{border:1px solid #a4a4a4;}
+.promotion .promoLink{width:100%; height:100%; position:absolute; top:0; left:0;}
+.action{padding:0;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    right: 16px;
+}
+
+.button.winner{background-color:#f37720; margin-left:5px; margin-top:10px;}
+
+.button.action:before{content:'+'; display:block; position:absolute; font-size: 52px;}
+.button.action.delete{background-color:#bf1313; top: 16px; }
+.button.action.new{background-color:green; top:0;}
+.button.action.new:before{top: -10px; left: 12px;}
+
+.button.action.delete:before{
+    margin-left:3px;
+    transform: rotate(45deg);
+    top: -9px;
+    left: 10px;
+}
+
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 #promotionContainer .promotion h3{margin-bottom:5px; font-size:22px;}
 #promotionContainer .promotion .date{margin-bottom:15px; font-size:12px;}
 /*#promotionContainer .promotion:hover{background-color:rgba(256,256,256,.5);}*/
@@ -48,23 +113,19 @@ fieldset{border: none; padding: 0; margin: 0;}
 
 /* CONTENT - WINNER PAGE*/
 #content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:10px; height:350px; position:relative;}
-#content .spinner{margin-bottom:56px;}
+#content .spinner{margin-bottom:65px;}
 #content .spinner.done{}
 #content h2{font-size:28px;}
+#content h2 span{font-size:28px;}
 #content h2 span{color: #fff; background-color: #f37720; padding: 13px 14px;}
 #content #buttonContainer{position:absolute; bottom:0; left:50%; transform:translateX(-50%);}
 
 fieldset{
-    margin-bottom:15px;
+    margin-bottom:25px;
 }
 
 fieldset .label{
     width:120px;
     margin-right:20px;
     float:left;
-}
-
-fieldset .action{
-    display: inline-block;
-    margin-left: 15px;
 }

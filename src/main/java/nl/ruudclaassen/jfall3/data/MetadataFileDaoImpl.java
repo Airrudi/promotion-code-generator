@@ -7,6 +7,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import nl.ruudclaassen.jfall3.model.Participant;
+import nl.ruudclaassen.jfall3.services.ParticipantService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import nl.ruudclaassen.jfall3.model.Metadata;
 
@@ -15,7 +19,10 @@ import nl.ruudclaassen.jfall3.model.Metadata;
 public class MetadataFileDaoImpl implements MetadataDao {
 	
 	private static final String METAFILE = "metafile.csv";
-	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,numberOfParticipants,winningCode";
+	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,numberOfParticipants,winnerId";
+
+	@Autowired
+	ParticipantService participantService;
 
 	@Override
 	public Map<String, Metadata> load(){			
@@ -48,13 +55,21 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	private void convertToMap(String metadataLine, Map<String, Metadata> metadataMap) {
 		// TODO: Fix if text contains ,
 		String[] metadataArray = metadataLine.split(",");
+		Participant participant = null;
 		
 		if(metadataArray.length < 7){
 			metadataArray = Arrays.copyOf(metadataArray, 7);
 		}
 
 		// Create new metadata object which is added to the metadataList
-		Metadata metadata = new Metadata(metadataArray[0], metadataArray[1], metadataArray[2], metadataArray[3], Integer.parseInt(metadataArray[4]), Integer.parseInt(metadataArray[5]),  metadataArray[6]);
+		Metadata metadata = new Metadata(metadataArray[0], metadataArray[1], metadataArray[2], metadataArray[3], Integer.parseInt(metadataArray[4]), Integer.parseInt(metadataArray[5]), participant);
+
+		// TODO: Q: Before or after metadata was created? Before you can only pass the metadata id...
+		if(metadataArray[6] != null) {
+			participant = participantService.getParticipantById(metadata, metadataArray[6]);
+			metadata.setWinner(participant);
+		}
+
 		metadataMap.put(metadata.getId(), metadata);
 	}
 
@@ -79,8 +94,8 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	public Metadata save(Metadata metadata){
 		try(FileWriter fileWriter = new FileWriter(METAFILE, true);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-			PrintWriter printWriter = new PrintWriter(bufferedWriter);){
-
+			PrintWriter printWriter = new PrintWriter(bufferedWriter);
+		){
 			printWriter.println(metadata.toString());
 
 		} catch (IOException e) {
@@ -97,6 +112,10 @@ public class MetadataFileDaoImpl implements MetadataDao {
 		// Keep some of the old values
 		Metadata oldMetadata = metadataMap.get(metadata.getId());
 		metadata.setCreationDate(oldMetadata.getCreationDate());
+
+		if(metadata.getNumberOfParticipants() == 0) {
+			metadata.setNumberOfParticipants(oldMetadata.getNumberOfParticipants());
+		}
 
 		if(metadata.getNumberOfCodes() == 0) {
 			metadata.setNumberOfCodes(oldMetadata.getNumberOfCodes());
