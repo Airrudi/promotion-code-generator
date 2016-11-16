@@ -6,7 +6,7 @@ import java.util.Set;
 
 //TODO: CR: public and abstract are not needed on an interface
 public interface CodeDao {
-	public abstract boolean save(String id, Set<String> codes);
+	public abstract boolean save(Metadata metaData, Set<String> codes);
 
 	public abstract Set<String> load(Metadata metadata);
 

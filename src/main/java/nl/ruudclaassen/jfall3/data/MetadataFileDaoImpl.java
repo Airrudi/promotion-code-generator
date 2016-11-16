@@ -43,9 +43,8 @@ public class MetadataFileDaoImpl implements MetadataDao {
 			this.createMetaFile();
 			e.printStackTrace();
 			// throw new RuntimeException("File not found");
-		} finally {
-			return metadataMap;
 		}
+		return metadataMap;
 	}
 
 	private void createMetaFile() {

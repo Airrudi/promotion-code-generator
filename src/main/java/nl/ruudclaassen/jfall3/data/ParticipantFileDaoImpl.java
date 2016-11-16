@@ -14,67 +14,66 @@ import java.util.stream.Stream;
 @Component
 public class ParticipantFileDaoImpl implements ParticipantDao {
 
-    public static final String HEADERS = "name,code,email";
+	public static final String HEADERS = "name,code,email";
 
-    @Override
-    public Map<String, Participant> delete() {
-        return null;
-    }
+	@Override
+	public Map<String, Participant> delete() {
+		return null;
+	}
 
-    @Override
-    public void save(Metadata metadata, Map<String, Participant> participantMap) {
-        // TODO: Check if file already exists?
-        String fileName = buildFileName(metadata.getId());
-        File file = new File(fileName);
+	@Override
+	public void save(Metadata metadata, Map<String, Participant> participantMap) {
+		// TODO: Check if file already exists?
+		String fileName = buildFileName(metadata.getId());
+		File file = new File(fileName);
 
-        // Overwrites existing file
-        try (PrintWriter writer = new PrintWriter(file, "UTF-8")){
-            writer.println(HEADERS);
+		// Overwrites existing file
+		try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
+			writer.println(HEADERS);
 
-            // Print the entries
-            for(Entry<String, Participant> e : participantMap.entrySet()) {
-                writer.println(e.getValue());
-            }
+			// Print the entries
+			for (Entry<String, Participant> e : participantMap.entrySet()) {
+				writer.println(e.getValue());
+			}
 
-            //participantMap.forEach((participant)->writer.println(participant));
+			// participantMap.forEach((participant)->writer.println(participant));
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            System.out.println("Schrijven mislukt");
+		} catch (IOException e) {
+			// TODO: CR and now what? 
+			System.out.println("Schrijven mislukt");
+		}
+	}
 
-        }
-    }
+	public String buildFileName(String id) {
+		return "participant-" + id + ".csv";
+	}
 
-    public String buildFileName(String id){
-        return "participant-" + id + ".csv";
-    }
+	private void buildParticipantMap(String line, Map<String, Participant> participants) {
+		String[] lineArray = line.split(",");
+		Participant participant = new Participant(lineArray[0], lineArray[1], lineArray[2], lineArray[3]);
+		participants.put(participant.getId(), participant);
+	}
 
-    private void buildParticipantMap(String line, Map<String, Participant> participants){
-        String[] lineArray = line.split(",");
-        Participant participant = new Participant(lineArray[0], lineArray[1], lineArray[2], lineArray[3]);
-        participants.put(participant.getId(), participant);
-    }
+	@Override
+	public Map<String, Participant> load(Metadata metadata) {
+		Map<String, Participant> participants = new HashMap<>();
+		String fileName = buildFileName(metadata.getId());
 
-    @Override
-    public Map<String, Participant> load(Metadata metadata) {
-        Map<String, Participant> participants = new HashMap<>();
-        String fileName = buildFileName(metadata.getId());
+		System.out.println("Start reading ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
+		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+			stream.skip(1).forEach(s -> buildParticipantMap(s, participants));
+		} catch (IOException e) {
+			System.out.println("Failed to read ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
+			System.out.println("Returning empty list of participants");
+			// e.printStackTrace();
+		} finally {
+			return participants;
+		}
+	}
 
-        System.out.println("Start reading ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
-        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-            stream.skip(1).forEach(s -> buildParticipantMap(s, participants));
-        } catch (IOException e) {
-            System.out.println("Failed to read ParticipantFile from " + Paths.get(fileName).toAbsolutePath());
-            System.out.println("Returning empty list of participants");
-            //e.printStackTrace();
-        } finally{
-            return participants;
-        }
-    }
-
-    @Override
-    public Participant getParticipantById(Metadata metadata, String id) {
-        Map<String, Participant> participantMap = this.load(metadata);
-        return participantMap.get(id);
-    }
+	@Override
+	public Participant getParticipantById(Metadata metadata, String id) {
+		Map<String, Participant> participantMap = this.load(metadata);
+		return participantMap.get(id);
+	}
 }

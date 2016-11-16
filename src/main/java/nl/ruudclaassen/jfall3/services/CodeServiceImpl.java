@@ -56,12 +56,6 @@ public class CodeServiceImpl implements CodeService {
 	// Upload existing codes
 	// Upload existing participants
 
-	// TODO: CR why is this empty?
-	@Override
-	public Map<String, Metadata> delete(Metadata metadata) {
-		return null;
-	}
-
 	@Override
 	public void save(Metadata metadata, InputStream codeStream) {
 		Set<String> codes = new HashSet<>();
@@ -81,7 +75,7 @@ public class CodeServiceImpl implements CodeService {
 			// since we check participants by same list..
 			metadata.setNumberOfCodes(codes.size());
 			metadataService.update(metadata);
-			codeDao.save(metadata.getId(), codes);
+			codeDao.save(metadata, codes);
 
 		} catch (FileAlreadyExistsException e) {
 			// TODO: CR this does nothing
@@ -97,7 +91,7 @@ public class CodeServiceImpl implements CodeService {
 	@Override
 	public void save(Metadata metadata) {
 		Set<String> codes = generatorService.generateCodes(metadata.getNumberOfCodes());
-		codeDao.save(metadata.getId(), codes);
+		codeDao.save(metadata, codes);
 	}
 
 	// TODO:CR remove this, or move to a utility class
@@ -118,7 +112,7 @@ public class CodeServiceImpl implements CodeService {
 		return metadata;
 	}
 
-	// TODO CR: 
+	// TODO CR:
 	private void validateInput(Metadata metadata) throws InputValidationException {
 		List<Field> fields = new ArrayList<>();
 		String title = metadata.getTitle();
