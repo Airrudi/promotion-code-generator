@@ -24,7 +24,7 @@
 				<input id="title" type="text" th:field="*{title}"/>
 			</fieldset>
 			
-			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${newPromo}">
+			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${metadata.getNumberOfCodes() == 0}">
 				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
 
 				<p class="label" >Codes</p>
@@ -52,17 +52,7 @@
 
 			<fieldset>
 				<p class="label">Deelnemers</p>
-				<div th:if="${numberOfParticipants == 0}">
-					<div class="radioContainer">
-						<input id="notRegistered" type="radio" name="registeredParticipants" value="0" checked="checked" th:disabled="${!edit}"/><label for="notRegistered">Nee</label>
-						<input id="registered" type="radio" name="registeredParticipants" value="1" th:disabled="${!edit}"/><label for="registered">Ja</label>
-					</div>
-
-					<div id="uploadParticipantsContainer" class="subChoice" style="display:none;">
-						<label class="label extra" for="uploadParticipants">Uploaden</label>
-						<input id="uploadParticipants" name="uploadParticipants" type="file" value=""/>
-					</div>
-				</div>
+				<input id="uploadParticipants" name="uploadParticipants" type="file" value=""/>
 				<p th:if="${numberOfParticipants > 0}" th:inline="text">[[${numberOfParticipants}]]</p>
 			</fieldset>
 

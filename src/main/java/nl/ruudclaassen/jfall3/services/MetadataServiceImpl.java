@@ -1,12 +1,11 @@
 package nl.ruudclaassen.jfall3.services;
 
 import nl.ruudclaassen.jfall3.data.MetadataDao;
+import nl.ruudclaassen.jfall3.general.Utilities;
 import nl.ruudclaassen.jfall3.model.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,37 +16,30 @@ public class MetadataServiceImpl implements MetadataService {
     MetadataDao metadataDao;
 
     @Override
-    public Metadata getMetadataById(String id) {
-        return metadataDao.getMetadataById(id);
+    public Metadata getPromotionById(String id) {
+        return metadataDao.getPromotionById(id);
     }
 
     @Override
-    public Map<String, Metadata> load() {
-        return metadataDao.load();
+    public Map<String, Metadata> getPromotions() {
+        return metadataDao.getPromotions();
     }
 
     @Override
-    public Map<String, Metadata> delete(String promoId) {
-        return metadataDao.delete(promoId);
+    public void delete(String promoId) {
+        metadataDao.delete(promoId);
     }
 
     @Override
-    public void save(Metadata metadata) {
+    public Metadata save(Metadata metadata) {
         String id = UUID.randomUUID().toString();
         metadata.setId(id);
-        metadata.setCreationDate(getFormattedDate());
-        metadataDao.save(metadata);
+        metadata.setCreationDate(Utilities.getFormattedDate());
+        return metadataDao.save(metadata);
     }
 
     @Override
-    public Map<String, Metadata> update(Metadata metadata) {
+    public Metadata update(Metadata metadata) {
         return metadataDao.update(metadata);
-    }
-
-	// TODO: CR move this to a utilities class
-    private String getFormattedDate() {
-        LocalDateTime dateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return dateTime.format(formatter);
     }
 }

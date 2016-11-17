@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 // TODO: CR please consistently code to interfaces
 @Service
 public class WinnerService {
-	
+
 	public Participant pickWinner(Map<String, Participant> participants){
 		
 		// TODO: CR subtracting 1 and then adding it again does nothing

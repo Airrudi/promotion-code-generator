@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import nl.ruudclaassen.jfall3.exceptions.PromotionNotFoundException;
 import nl.ruudclaassen.jfall3.model.Metadata;
 import nl.ruudclaassen.jfall3.model.Participant;
 import nl.ruudclaassen.jfall3.services.ParticipantService;
@@ -24,14 +25,13 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	private static final String METAFILE = "metafile.csv";
 	private static final String HEADERS = "id,title,note,creationDate,numberOfCodes,numberOfParticipants,winnerId";
 
-	// TODO: CR: DAO must never reference service (dependency goes the wrong way!)
 	@Autowired
-	ParticipantService participantService;
+	ParticipantDao participantDao;
 
 	// TODO: CR - do not use system.out.println; do not return something from a finally block; do
 	// not use printStackTrace
 	@Override
-	public Map<String, Metadata> load() {
+	public Map<String, Metadata> getPromotions() {
 		Map<String, Metadata> metadataMap = new HashMap<>();
 
 		System.out.println("Start reading metafile from " + Paths.get(METAFILE).toAbsolutePath());
@@ -57,7 +57,6 @@ public class MetadataFileDaoImpl implements MetadataDao {
 		}
 	}
 
-	// TODO: CR this code references a service, this is not allowed in a DAO. move to service layer
 	// TODO: CR magic numbers
 	private void convertToMap(String metadataLine, Map<String, Metadata> metadataMap) {
 		// TODO: Fix if text contains ,
@@ -75,7 +74,7 @@ public class MetadataFileDaoImpl implements MetadataDao {
 		// TODO: Q: Before or after metadata was created? Before you can only pass the metadata
 		// id...
 		if (metadataArray[6] != null) {
-			participant = participantService.getParticipantById(metadata, metadataArray[6]);
+			participant = participantDao.getParticipantById(metadata, metadataArray[6]);
 			metadata.setWinner(participant);
 		}
 
@@ -83,20 +82,23 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	}
 
 	@Override
-	public Metadata getMetadataById(String id) {
-		Map<String, Metadata> metadataMap = this.load();
-		return metadataMap.get(id);
+	public Metadata getPromotionById(String id) {
+		Map<String, Metadata> metadataMap = this.getPromotions();
+		Metadata metadata = metadataMap.get(id);
+
+		if(metadata == null){
+			throw new PromotionNotFoundException("Promotion could not be found");
+		}
+
+		return metadata;
 	}
 
 	@Override
-	public Map<String, Metadata> delete(String promoId) {
+	public void delete(String promoId) {
 		Map<String, Metadata> metadataMap = new HashMap<>();
-		metadataMap = this.load();
+		metadataMap = this.getPromotions();
 		metadataMap.remove(promoId);
 		this.save(metadataMap);
-
-		// TODO: Check to see if something was removed?
-		return metadataMap;
 	}
 
 	@Override
@@ -113,8 +115,8 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	}
 
 	@Override
-	public Map<String, Metadata> update(Metadata metadata) {
-		Map<String, Metadata> metadataMap = this.load();
+	public Metadata update(Metadata metadata) {
+		Map<String, Metadata> metadataMap = this.getPromotions();
 
 		// Keep some of the old values
 		Metadata oldMetadata = metadataMap.get(metadata.getId());
@@ -131,7 +133,7 @@ public class MetadataFileDaoImpl implements MetadataDao {
 		metadataMap.replace(metadata.getId(), metadata);
 		this.save(metadataMap);
 
-		return metadataMap;
+		return metadata;
 	}
 
 	public boolean save(Map<String, Metadata> metadataMap) {
@@ -153,7 +155,7 @@ public class MetadataFileDaoImpl implements MetadataDao {
 	}
 
 	public boolean save(String promoId, Metadata metadata) {
-		Map<String, Metadata> metadataMap = this.load();
+		Map<String, Metadata> metadataMap = this.getPromotions();
 
 		metadataMap.put(promoId, metadata);
 		this.save(metadataMap);

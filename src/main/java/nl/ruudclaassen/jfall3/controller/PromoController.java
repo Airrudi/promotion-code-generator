@@ -1,20 +1,24 @@
 package nl.ruudclaassen.jfall3.controller;
 
+import nl.ruudclaassen.jfall3.exceptions.EmptyFileException;
+import nl.ruudclaassen.jfall3.exceptions.FileTooBigException;
+import nl.ruudclaassen.jfall3.exceptions.PromotionNotFoundException;
+import nl.ruudclaassen.jfall3.exceptions.WriteFailedException;
 import nl.ruudclaassen.jfall3.model.Metadata;
 import nl.ruudclaassen.jfall3.model.Participant;
 import nl.ruudclaassen.jfall3.services.CodeService;
 import nl.ruudclaassen.jfall3.services.MetadataService;
 import nl.ruudclaassen.jfall3.services.ParticipantService;
-
+import nl.ruudclaassen.jfall3.general.Constants;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 // TODO: CR: add comments to describe what the methods do 
@@ -22,135 +26,146 @@ import java.util.Map;
 @Controller
 public class PromoController {
 
-	@Autowired
-	private MetadataService metadataService;
+    private static Logger logger = Logger.getLogger(PromoController.class);
 
-	@Autowired
-	private CodeService codeService;
+    @Autowired
+    private MetadataService metadataService;
 
-	@Autowired
-	private ParticipantService participantService;
+    @Autowired
+    private CodeService codeService;
 
-	@RequestMapping("/promo/")
-	public String load(ModelMap modelMap) {
+    @Autowired
+    private ParticipantService participantService;
 
-		Map<String, Metadata> promotions = metadataService.load();
-		modelMap.put("promotions", promotions);
+    @RequestMapping("/promo")
+    public String redirectPromo(ModelMap modelMap) {
+        return Constants.REDIRECT_PROMOTIONS;
+    }
 
-		return "promotions";
-	}
+    @RequestMapping("/promo/")
+    public String load(Model model) {
+        Map<String, Metadata> promotions = metadataService.getPromotions();
+        model.addAttribute("promotions", promotions);
 
-	@RequestMapping(value = "/promo/", method = RequestMethod.POST)
-	public String delete(@RequestParam String promoId, ModelMap modelMap) {
+        return Constants.PROMOTIONS;
+    }
 
-		// Returns map with remaining promotions
-		// TODO: Q: Get metadata first or put promoId directly in method below?
+    @RequestMapping(value = "/promo/", method = RequestMethod.POST)
+    public String delete(@RequestParam String promoId, Model model) {
+        metadataService.delete(promoId);
 
-		// TODO: CR: don't have the delete method return everything that is left as a side effect
-		Map<String, Metadata> promotions = metadataService.delete(promoId);
-		modelMap.put("promotions", promotions);
+        Map<String, Metadata> promotions = metadataService.getPromotions();
+        model.addAttribute("promotions", promotions);
 
-		return "promotions";
-	}
+        return Constants.PROMOTIONS;
+    }
 
-	@RequestMapping("/promo/new")
-	public String newPromo(ModelMap modelMap) {
-		modelMap.put("metadata", new Metadata());
-		modelMap.put("newPromo", true);
-		modelMap.put("edit", false);
-		modelMap.put("numberOfParticipants", 0);
-		modelMap.put("title", "Nieuwe promotie");
+    @RequestMapping("/promo/new")
+    public String newPromo(ModelMap modelMap) {
+        modelMap.put("metadata", new Metadata());
+        modelMap.put("newPromo", true);
+        modelMap.put("edit", false);
+        modelMap.put("numberOfParticipants", 0);
+        modelMap.put("title", "Nieuwe promotie");
 
-		return "promo-form";
-	}
+        return Constants.PROMOTION_EDIT;
+    }
 
-	@RequestMapping(value = "/promo/new", method = RequestMethod.POST)
-	public String savePromo(Metadata metadata, ModelMap modelMap,
-	        @RequestParam(required = false, name = "uploadCodes") MultipartFile codeFile,
-	        @RequestParam(required = false, name = "uploadParticipants") MultipartFile uploadParticipants,
-	        @RequestParam String generateOrUpload, @RequestParam(required = false) String registeredParticipants) {
+    @RequestMapping(value = "/promo/new", method = RequestMethod.POST)
+    public String savePromo(Metadata metadata, ModelMap modelMap,
+                            @RequestParam(required = false, name = "uploadCodes") MultipartFile codeFile,
+                            @RequestParam(required = false, name = "participantFile") MultipartFile participantFile,
+                            @RequestParam String generateOrUpload) {
 
-		try {
+        try {
 
-			metadataService.save(metadata);
+            metadataService.save(metadata);
 
-			// TODO: CR: use an enum rather than a string
-			if (generateOrUpload.equals("upload") && validFile("txt", codeFile)) {
-				codeService.save(metadata, codeFile.getInputStream());
-			} else {
-				codeService.save(metadata);
-			}
+            // TODO: CR: use an enum rather than a string
+            if (generateOrUpload.equals("upload") && validFile(codeFile)) {
+                codeService.save(metadata, codeFile.getInputStream());
+            } else {
+                codeService.save(metadata);
+            }
 
-			// TODO: CR: "1" is a magic number, it is unclear what is does and can lead to errors
-			if (registeredParticipants != null && registeredParticipants.equals("1")
-			        && validFile("csv", uploadParticipants)) {
-				participantService.save(metadata, uploadParticipants.getInputStream());
-			}
+            if (participantFile != null && validFile(participantFile)) {
+                participantService.save(metadata, participantFile.getInputStream());
+            }
+        } catch (FileTooBigException e) {
 
-		} catch (Exception e) {
-			// TODO: CR: never catch java.lang.Exception and do not use printStackTrace. use logger
-			// instead
-			e.printStackTrace();
-		}
+        } catch (IOException e) {
 
-		return "redirect:/promo/";
-	}
+        }
 
-	@RequestMapping("/promo/{id}/edit")
-	public String getPromo(ModelMap modelMap, @PathVariable String id) {
+        return Constants.REDIRECT_PROMOTIONS;
+    }
 
-		Metadata metadata = metadataService.getMetadataById(id);
-		int numberOfParticipants = metadata.getNumberOfParticipants();
-		Participant participant = metadata.getWinner();
+    @RequestMapping("/promo/{id}/edit")
+    public String getPromo(ModelMap modelMap, @PathVariable String id) {
 
-		// TODO: Check how thymeleaf deals with missing variables (if participant is null and does
-		// not exist in the modelmap)
-		if (participant != null) {
-			modelMap.put("winner", participant.getName());
-			modelMap.put("winningCode", participant.getCode());
-		}
+        Metadata metadata = metadataService.getPromotionById(id);
+        int numberOfParticipants = metadata.getNumberOfParticipants();
+        Participant participant = metadata.getWinner();
 
-		modelMap.put("title", "Promotie aanpassen");
-		modelMap.put("metadata", metadata);
-		modelMap.put("edit", true);
-		modelMap.put("numberOfParticipants", numberOfParticipants);
+        // TODO: Check how thymeleaf deals with missing variables (if participant is null and does
+        // not exist in the modelmap)
+        if (participant != null) {
+            modelMap.put("winner", participant.getName());
+            modelMap.put("winningCode", participant.getCode());
+        }
 
-		return "promo-form";
-	}
+        modelMap.put("title", "Promotie aanpassen");
+        modelMap.put("metadata", metadata);
+        modelMap.put("edit", true);
+        modelMap.put("numberOfParticipants", numberOfParticipants);
 
-	@RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.POST)
-	public String editPromo(Metadata metadata, ModelMap modelMap,
-	        @RequestParam(required = false, name = "uploadParticipants") MultipartFile participantFile,
-	        @RequestParam(required = false) String registeredParticipants) {
+        return Constants.PROMOTION_EDIT;
+    }
 
-		try {
-			metadataService.update(metadata);
+    @RequestMapping(value = "/promo/{id}/edit", method = RequestMethod.POST)
+    public String editPromo(
+            Metadata metadata,
+            @RequestParam(required = false, name = "uploadParticipants") MultipartFile participantFile
+    ) throws IOException {
 
-			// TODO: CR: duplicated code
-			if (registeredParticipants != null && registeredParticipants.equals("1")
-			        && validFile("csv", participantFile)) {
-				participantService.save(metadata, participantFile.getInputStream());
-				// ParticipantService.VALID_PARTICIPANTS_LIST;
-			}
+        metadataService.update(metadata);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        if (participantFile != null && validFile(participantFile)) {
+            participantService.save(metadata, participantFile.getInputStream());
+        }
 
-		return "redirect:/promo/";
-	}
+        return Constants.REDIRECT_PROMOTIONS;
+    }
 
-	private boolean validFile(String fileType, MultipartFile file) throws Exception {
-		// if (!file.getContentType().equals(fileType)) {
-		// throw new Exception("Incorrect fileType");
-		// }
+    private boolean validFile(MultipartFile file) {
 
-		// TODO: CR: introduce a constant
-		if ((file.getSize() / 1024 > 1000)) {
-			throw new Exception("File is to big");
-		}
+        if (file.getSize() == 0) {
+            throw new EmptyFileException("File is empty");
+        }
 
-		return true;
-	}
+        if ((file.getSize() / 1024 > 1000)) {
+            throw new FileTooBigException("File is too big");
+        }
 
+        return true;
+    }
+
+    @ExceptionHandler(value = WriteFailedException.class)
+    public String onWriteFailedException(WriteFailedException ex) {
+        logger.error(ex.getMessage());
+
+        return Constants.REDIRECT_PROMOTIONS;
+    }
+
+    @ExceptionHandler(value = IOException.class)
+    public void onIOException(IOException ioe) {
+        logger.error(ioe.getMessage());
+    }
+
+    @ExceptionHandler(PromotionNotFoundException.class)
+    public String notFound(Model model, Exception ex){
+        model.addAttribute("ex", ex);
+
+        return Constants.PROMOTION_EDIT;
+    }
 }

@@ -6,9 +6,25 @@ import java.io.InputStream;
 import java.util.Map;
 
 public interface MetadataService {
-    public abstract Metadata getMetadataById(String id);
-    public abstract Map<String, Metadata> load();
-    public abstract Map<String, Metadata> delete(String promoId);
-    public abstract void save(Metadata metadata);
-    public abstract Map<String, Metadata> update(Metadata metadata);
+    Metadata getPromotionById(String id);
+
+    /**
+     * Loads all the promotions
+     *
+     * @return Map<String, Metadata> with id and metadata pairs
+     */
+    Map<String, Metadata> getPromotions();
+
+
+    void delete(String promoId);
+
+    /**
+     * Creates new promotion (generates new id etc.)
+     */
+    Metadata save(Metadata metadata);
+
+    /**
+     * Updates an existing promotion (does not create a new id)
+     */
+    Metadata update(Metadata metadata);
 }

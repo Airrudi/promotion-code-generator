@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css?family=PT+Sans');
 *{margin:0; padding:0; border:0; font-size:15px; font-family:'PT sans';}
 
-body{background-color:#efefef; font-family:sans-serif; width:750px; margin:0 auto; margin-top:50px; position:relative;}
+body{background-color:#efefef; font-family:sans-serif; width:750px; margin:0 auto; margin:50px auto; position:relative;}
 h1{margin-bottom:40px; font-size:35px; border-bottom:1px solid #000; padding-bottom:12px;}
 p{font-size:15px;}
 a{text-decoration:none; color:#000;}
@@ -24,7 +24,7 @@ input[type="radio"] + label{margin-right:15px;}
 input[type="file"]{padding:4px 0;}
 textarea{resize: none; width:300px;}
 .label{padding:8px 0;}
-.label.extra{font-style:italic;}
+.label.extra{font-style:italic; margin-left: 20px; width: 100px;}
 ul li .label{padding:3px 0;}
 
 .radioContainer{padding:8px 0;}

@@ -1,16 +1,17 @@
 package nl.ruudclaassen.jfall3.data;
 
-import java.util.Map;
 import nl.ruudclaassen.jfall3.model.Metadata;
 
+import java.util.Map;
+
 public interface MetadataDao {
-	public abstract Map<String, Metadata> load();
+    Map<String, Metadata> getPromotions();
 
-	public abstract Metadata save(Metadata metadata);
+    Metadata save(Metadata metadata);
 
-	public abstract Map<String, Metadata> update(Metadata metadata);
+    Metadata update(Metadata metadata);
 
-	public abstract Metadata getMetadataById(String id);
+    Metadata getPromotionById(String id);
 
-	public abstract Map<String, Metadata> delete(String promoId);
+    void delete(String promoId);
 }

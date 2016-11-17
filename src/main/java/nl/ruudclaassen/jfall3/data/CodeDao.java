@@ -4,11 +4,11 @@ import nl.ruudclaassen.jfall3.model.Metadata;
 
 import java.util.Set;
 
-//TODO: CR: public and abstract are not needed on an interface
 public interface CodeDao {
-	public abstract boolean save(Metadata metaData, Set<String> codes);
 
-	public abstract Set<String> load(Metadata metadata);
+	boolean save(Metadata metaData, Set<String> codes);
 
-	public abstract void delete(Metadata metadata);
+	Set<String> load(Metadata metadata);
+
+	void delete(Metadata metadata);
 }

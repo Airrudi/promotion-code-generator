@@ -8,3 +8,4 @@
 - Change the uploaded participants (overwriting existing input)
 - Uploading codes and participants with additional buttons in edit mode, preventing the need to save twice
 - Feedback on uploads
+- Ability to delete promotion in edit mode

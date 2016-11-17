@@ -45,9 +45,10 @@ public class ParticipantServiceImpl implements ParticipantService {
 
 			while ((line = bufferedReader.readLine()) != null) {
 				String[] lineArray = line.split(",");
+				if(lineArray.length == 0){continue;}
+
 				String id = UUID.randomUUID().toString();
-				Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(),
-				        lineArray[2].trim());
+				Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
 				participants.put(participant.getId(), participant);
 			}
 
@@ -106,9 +107,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
 		// Map of map of map of participants
 		Map<String, Map<String, Participant>> participantMap = new HashMap<>();
-		participantMap.put("valid", validParticipants);
-		participantMap.put("invalid", invalidParticipants);
-		participantMap.put("duplicate", participantDuplicateCode);
+		participantMap.put(VALID_PARTICIPANTS_LIST, validParticipants);
+		participantMap.put(INVALID_PARTICIPANTS_LIST, invalidParticipants);
+		participantMap.put(DUPLICATE_PARTICIPANTS_LIST, participantDuplicateCode);
 
 		metadata.setNumberOfParticipants(validParticipants.size());
 		metadataService.update(metadata);

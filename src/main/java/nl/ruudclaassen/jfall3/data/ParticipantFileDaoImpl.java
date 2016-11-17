@@ -1,7 +1,9 @@
 package nl.ruudclaassen.jfall3.data;
 
+import nl.ruudclaassen.jfall3.exceptions.WriteFailedException;
 import nl.ruudclaassen.jfall3.model.Metadata;
 import nl.ruudclaassen.jfall3.model.Participant;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -14,7 +16,9 @@ import java.util.stream.Stream;
 @Component
 public class ParticipantFileDaoImpl implements ParticipantDao {
 
-	public static final String HEADERS = "name,code,email";
+	private static final String HEADERS = "name,code,email";
+
+	private static final Logger LOG = Logger.getLogger(ParticipantFileDaoImpl.class);
 
 	@Override
 	public Map<String, Participant> delete() {
@@ -23,6 +27,7 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
 
 	@Override
 	public void save(Metadata metadata, Map<String, Participant> participantMap) {
+
 		// TODO: Check if file already exists?
 		String fileName = buildFileName(metadata.getId());
 		File file = new File(fileName);
@@ -36,11 +41,12 @@ public class ParticipantFileDaoImpl implements ParticipantDao {
 				writer.println(e.getValue());
 			}
 
+			throw new IOException("on purpose");
+
 			// participantMap.forEach((participant)->writer.println(participant));
 
 		} catch (IOException e) {
-			// TODO: CR and now what? 
-			System.out.println("Schrijven mislukt");
+			throw new WriteFailedException("Schrijven mislukt");
 		}
 	}
 
