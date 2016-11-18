@@ -1,30 +1,29 @@
 package nl.ruudclaassen.jfall3.services;
 
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Promotion;
 
-import java.io.InputStream;
-import java.util.Map;
+import java.util.List;
 
-public interface MetadataService {
-    Metadata getPromotionById(String id);
+public interface PromotionService {
+    Promotion getPromotionById(int id);
 
     /**
      * Loads all the promotions
      *
-     * @return Map<String, Metadata> with id and metadata pairs
+     * @return Map<String, Promotion> with id and Promotion pairs
      */
-    Map<String, Metadata> getPromotions();
+    List<Promotion> getPromotions();
 
 
-    void delete(String promoId);
+    void delete(int promoId);
 
     /**
      * Creates new promotion (generates new id etc.)
      */
-    Metadata save(Metadata metadata);
+    Promotion save(Promotion Promotion);
 
     /**
      * Updates an existing promotion (does not create a new id)
      */
-    Metadata update(Metadata metadata);
+    Promotion update(Promotion Promotion);
 }

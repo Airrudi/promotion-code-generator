@@ -2,10 +2,10 @@ package nl.ruudclaassen.jfall3.controller;
 
 import javax.servlet.http.HttpSession;
 
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Promotion;
 import nl.ruudclaassen.jfall3.model.Participant;
 import nl.ruudclaassen.jfall3.services.CodeService;
-import nl.ruudclaassen.jfall3.services.MetadataService;
+import nl.ruudclaassen.jfall3.services.PromotionService;
 import nl.ruudclaassen.jfall3.services.ParticipantService;
 
 import nl.ruudclaassen.jfall3.general.Constants;
@@ -23,7 +23,7 @@ public class WinnerController {
 	private CodeService codeService;
 
 	@Autowired
-	private MetadataService metadataService;
+	private PromotionService PromotionService;
 
 	@Autowired
 	private ParticipantService participantService;
@@ -34,17 +34,17 @@ public class WinnerController {
 	}
 
 	@RequestMapping("promo/{id}/winner/spin")
-	public String redirectWinner(@PathVariable String id) {
+	public String redirectWinner(@PathVariable int id) {
 		return "redirect:/promo/";
 	}
 
 	@RequestMapping("promo/{id}/winner/reset")
-	public String resetWinner(@PathVariable String id, @RequestParam(value = "caller", required = false) String caller,
+	public String resetWinner(@PathVariable int id, @RequestParam(value = "caller", required = false) String caller,
 	        ModelMap modelMap) {
 
-		Metadata metadata = metadataService.getPromotionById(id);
-		metadata.setWinner(null);
-		metadataService.update(metadata);
+		Promotion Promotion = PromotionService.getPromotionById(id);
+		Promotion.setWinner(null);
+		PromotionService.update(Promotion);
 
 		// TODO: CR use Yoda conditions here (removes the need for a null-check)
 		if ("edit".equals(caller)) {
@@ -55,16 +55,16 @@ public class WinnerController {
 	}
 
 	@RequestMapping(value = "/promo/{id}/winner/", method = RequestMethod.POST)
-	public String loadPromotion(HttpSession session, @RequestParam String promoId, ModelMap modelMap) {
+	public String loadPromotion(HttpSession session, @RequestParam int promoId, ModelMap modelMap) {
 
-		Metadata metadata = (Metadata) session.getAttribute("metadata");
+		Promotion Promotion = (Promotion) session.getAttribute("Promotion");
 
-		if (metadata == null) {
-			metadata = metadataService.getPromotionById(promoId);
-			session.setAttribute("metadata", metadata);
+		if (Promotion == null) {
+			Promotion = PromotionService.getPromotionById(promoId);
+			session.setAttribute("Promotion", Promotion);
 		}
 
-		modelMap.put("metadata", metadata);
+		modelMap.put("Promotion", Promotion);
 		modelMap.put("winner", "");
 		modelMap.put("winningCode", "");
 		modelMap.put("spin", false);
@@ -73,26 +73,26 @@ public class WinnerController {
 	}
 
 	@RequestMapping(value = "/promo/{id}/winner/spin", method = RequestMethod.POST)
-	public String loadCodes(@PathVariable String id, @RequestParam String activateSpinner, ModelMap modelMap) {
+	public String loadCodes(@PathVariable int id, @RequestParam String activateSpinner, ModelMap modelMap) {
 
-		Metadata metadata = metadataService.getPromotionById(id);
+		Promotion Promotion = PromotionService.getPromotionById(id);
 
-		if (metadata == null) {
+		if (Promotion == null) {
 			return Constants.REDIRECT_HOME;
 		}
 
 		// If spin button was not pressed, redirect back to winner page)
 		if (Integer.parseInt(activateSpinner) != 1) {
-			return Constants.REDIRECT_PROMOTIONS + metadata.getId() + "/winner/";
+			return Constants.REDIRECT_PROMOTIONS + Promotion.getId() + "/winner/";
 		}
 
-		Participant participant = participantService.pickWinner(metadata);
+		Participant participant = participantService.pickWinner(Promotion);
 
-		// Update metadata with winning code
-		metadata.setWinner(participant);
-		metadataService.update(metadata);
+		// Update Promotion with winning code
+		Promotion.setWinner(participant);
+		PromotionService.update(Promotion);
 
-		modelMap.put("metadata", metadata);
+		modelMap.put("Promotion", Promotion);
 		modelMap.put("spin", true);
 		modelMap.put("winner", participant.getName());
 		modelMap.put("winningCode", participant.getCode());

@@ -1,7 +1,7 @@
 package nl.ruudclaassen.jfall3.services;
 
 import nl.ruudclaassen.jfall3.data.ParticipantDao;
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Promotion;
 import nl.ruudclaassen.jfall3.model.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,62 +27,62 @@ public class ParticipantServiceImpl implements ParticipantService {
 	WinnerService winnerService;
 
 	@Autowired
-	MetadataService metadataService;
+	PromotionService PromotionService;
 
 	@Override
-	public Map<String, Map<String, Participant>> save(Metadata metadata, InputStream inputParticipants) {
+	public Map<String, Map<String, Participant>> save(Promotion Promotion, InputStream inputParticipants) {
 
 		Map<String, Map<String, Participant>> participantMap = new HashMap<>();
 
-		try (InputStreamReader inputStreamReader = new InputStreamReader(inputParticipants);
-		        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-
-			Map<String, Participant> participants = new HashMap<>();
-			String line;
-
-			// TODO: Better way to skip first line
-			bufferedReader.readLine();
-
-			while ((line = bufferedReader.readLine()) != null) {
-				String[] lineArray = line.split(",");
-				if(lineArray.length == 0){continue;}
-
-				String id = UUID.randomUUID().toString();
-				Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
-				participants.put(participant.getId(), participant);
-			}
-
-			participantMap = this.validateCodes(metadata, participants);
-			if (!participantMap.get("valid").isEmpty()) {
-				participantDao.save(metadata, participantMap.get("valid"));
-			}
-
-		} catch (FileAlreadyExistsException e) {
-			// TODO: CR this exception is swallowed and nothing is returned
-			e.getFile();
-		} catch (IOException ioe) {
-			// TODO: CR don't print stack traces
-			ioe.printStackTrace();
-		}
+//		try (InputStreamReader inputStreamReader = new InputStreamReader(inputParticipants);
+//		        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+//
+//			Map<String, Participant> participants = new HashMap<>();
+//			String line;
+//
+//			// TODO: Better way to skip first line
+//			bufferedReader.readLine();
+//
+//			while ((line = bufferedReader.readLine()) != null) {
+//				String[] lineArray = line.split(",");
+//				if(lineArray.length == 0){continue;}
+//
+//				String id = UUID.randomUUID().toString();
+//				Participant participant = new Participant(id, lineArray[0].trim(), lineArray[1].trim(), lineArray[2].trim());
+//				participants.put(participant.getId(), participant);
+//			}
+//
+//			participantMap = this.validateCodes(Promotion, participants);
+//			if (!participantMap.get("valid").isEmpty()) {
+//				participantDao.save(Promotion, participantMap.get("valid"));
+//			}
+//
+//		} catch (FileAlreadyExistsException e) {
+//			// TODO: CR this exception is swallowed and nothing is returned
+//			e.getFile();
+//		} catch (IOException ioe) {
+//			// TODO: CR don't print stack traces
+//			ioe.printStackTrace();
+//		}
 
 		return participantMap;
 	}
 
 	@Override
-	public Participant pickWinner(Metadata metadata) {
-		Map<String, Participant> participants = this.load(metadata);
+	public Participant pickWinner(Promotion Promotion) {
+		Map<String, Participant> participants = this.load(Promotion);
 		Participant winningParticipant = winnerService.pickWinner(participants);
 
 		return winningParticipant;
 	}
 
 	@Override
-	public Participant getParticipantById(Metadata metadata, String id) {
-		return participantDao.getParticipantById(metadata, id);
+	public Participant getParticipantById(Promotion Promotion, String id) {
+		return participantDao.getParticipantById(Promotion, id);
 	}
 
-	private Map<String, Map<String, Participant>> validateCodes(Metadata metadata, Map<String, Participant> participants) {
-		Set<String> generatedCodes = codeService.load(metadata);
+	private Map<String, Map<String, Participant>> validateCodes(Promotion Promotion, Map<String, Participant> participants) {
+		Set<String> generatedCodes = codeService.load(Promotion);
 		Set<String> participantCodes = new HashSet<>();
 		boolean codeIsNew;
 
@@ -111,14 +111,14 @@ public class ParticipantServiceImpl implements ParticipantService {
 		participantMap.put(INVALID_PARTICIPANTS_LIST, invalidParticipants);
 		participantMap.put(DUPLICATE_PARTICIPANTS_LIST, participantDuplicateCode);
 
-		metadata.setNumberOfParticipants(validParticipants.size());
-		metadataService.update(metadata);
+		Promotion.setNumberOfParticipants(validParticipants.size());
+		PromotionService.update(Promotion);
 
 		return participantMap;
 	}
 
 	@Override
-	public Map<String, Participant> load(Metadata metadata) {
-		return participantDao.load(metadata);
+	public Map<String, Participant> load(Promotion Promotion) {
+		return participantDao.load(Promotion);
 	}
 }

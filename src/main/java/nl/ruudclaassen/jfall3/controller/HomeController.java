@@ -17,7 +17,7 @@ public class HomeController {
     CodeServiceImpl codeService;
 
     @RequestMapping("/")
-    public String home(HttpSession session, ModelMap modelMap) {
+    public String home(ModelMap modelMap) {
         return Constants.HOMEPAGE;
     }
 }

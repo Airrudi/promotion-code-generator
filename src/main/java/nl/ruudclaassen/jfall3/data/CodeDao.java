@@ -1,14 +1,16 @@
 package nl.ruudclaassen.jfall3.data;
 
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Code;
+import nl.ruudclaassen.jfall3.model.Promotion;
 
+import java.util.List;
 import java.util.Set;
 
 public interface CodeDao {
 
-	boolean save(Metadata metaData, Set<String> codes);
+    boolean save(List<Code> codes);
 
-	Set<String> load(Metadata metadata);
+    Set<String> load(Promotion Promotion);
 
-	void delete(Metadata metadata);
+    void delete(Promotion Promotion);
 }

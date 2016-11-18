@@ -3,7 +3,7 @@ package nl.ruudclaassen.jfall3.services;
 import java.io.InputStream;
 import java.util.Map;
 
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Promotion;
 import nl.ruudclaassen.jfall3.model.Participant;
 
 /**
@@ -22,14 +22,14 @@ public interface ParticipantService {
     /**
      * Map keys are the constants defined in this interface
      *
-     * @param metadata
+     * @param Promotion
      * @param inputParticipants the stream containing the csv participants
      * @return a map with lists for each scenario in the keys
      */
-    Map<String, Map<String, Participant>> save(Metadata metadata, InputStream inputParticipants);
+    Map<String, Map<String, Participant>> save(Promotion Promotion, InputStream inputParticipants);
 
-    Map<String, Participant> load(Metadata metadata);
+    Map<String, Participant> load(Promotion Promotion);
 
-    Participant pickWinner(Metadata metadata);
-    Participant getParticipantById(Metadata metadata, String id);
+    Participant pickWinner(Promotion Promotion);
+    Participant getParticipantById(Promotion Promotion, String id);
 }

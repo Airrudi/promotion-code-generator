@@ -1,7 +1,7 @@
 package nl.ruudclaassen.jfall3.services;
 
 import nl.ruudclaassen.jfall3.data.ParticipantDao;
-import nl.ruudclaassen.jfall3.model.Metadata;
+import nl.ruudclaassen.jfall3.model.Promotion;
 import nl.ruudclaassen.jfall3.model.Participant;
 import org.junit.After;
 import org.junit.Before;
@@ -24,22 +24,22 @@ public class ParticipantServiceImplTest {
 
     @InjectMocks
     private ParticipantServiceImpl participantService;
-    private Metadata metadata;
+    private Promotion Promotion;
 
     @Mock
     private ParticipantDao participantDao;
 
     @Mock
-    private MetadataService metadataService;
+    private PromotionService PromotionService;
 
     @Mock
     private CodeService codeService;
 
     @Before
     public void setUp() throws Exception {
-        metadata = new Metadata("id");
+        Promotion = new Promotion(1);
         Set<String> codes = new HashSet<>(Arrays.asList("1234", "5678", "9012", "3456"));
-        when(codeService.load(metadata)).thenReturn(codes);
+        when(codeService.load(Promotion)).thenReturn(codes);
     }
 
 
@@ -51,7 +51,7 @@ public class ParticipantServiceImplTest {
 
     @Test
     public void emptyParticipantListWillNotGetSaved() throws Exception {
-        Map<String, Map<String, Participant>> returnMap = participantService.save(metadata, new ClassPathResource("emptyParticipants.csv").getInputStream());
+        Map<String, Map<String, Participant>> returnMap = participantService.save(Promotion, new ClassPathResource("emptyParticipants.csv").getInputStream());
 
         assertEquals(3, returnMap.size());
         assertEquals(0, returnMap.get(participantService.VALID_PARTICIPANTS_LIST).size());
@@ -61,9 +61,9 @@ public class ParticipantServiceImplTest {
 
     @Test
     public void save_filterOutInvalidAndDuplicateCode() throws Exception {
-        Map<String, Map<String, Participant>> returnMap = participantService.save(metadata, new ClassPathResource("invalidCodeParticipants.csv").getInputStream());
-        verify(codeService, times(1)).load(metadata);
-        verify(participantDao, times(1)).save(metadata, returnMap.get(participantService.VALID_PARTICIPANTS_LIST));
+        Map<String, Map<String, Participant>> returnMap = participantService.save(Promotion, new ClassPathResource("invalidCodeParticipants.csv").getInputStream());
+        verify(codeService, times(1)).load(Promotion);
+        verify(participantDao, times(1)).save(Promotion, returnMap.get(participantService.VALID_PARTICIPANTS_LIST));
 
         assertEquals(3, returnMap.size());
         assertEquals("number of valid codes", 2, returnMap.get(participantService.VALID_PARTICIPANTS_LIST).size());

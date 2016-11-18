@@ -1,8 +1,11 @@
 package nl.ruudclaassen.jfall3.services;
 
 
-import java.util.Set;
+import nl.ruudclaassen.jfall3.model.Code;
+import nl.ruudclaassen.jfall3.model.Promotion;
+
+import java.util.List;
 
 public interface GeneratorService {
-    public abstract Set<String> generateCodes(int requestedNumberOfCodes);
+    List<Code> generateCodes(Promotion promotion);
 }

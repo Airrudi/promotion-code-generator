@@ -17,14 +17,14 @@
 			<input id="winnerPromoId" name="promoId" type="hidden" value=""/>
 		</form>
 		
-		<form id="promoForm" class="clearfix" action="" method="POST" enctype="multipart/form-data" th:object="${metadata}">
+		<form id="promoForm" class="clearfix" action="" method="POST" enctype="multipart/form-data" th:object="${Promotion}">
 			<fieldset th:classappend="${errorTitle} ? error">
 				<p th:if="${errorTitle}">Wat is de titel van de actie?</p>
 				<label class="label" for="title">Titel*</label>
 				<input id="title" type="text" th:field="*{title}"/>
 			</fieldset>
 			
-			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${metadata.getNumberOfCodes() == 0}">
+			<fieldset th:classappend="${errorNumberOfCodes} ? error" th:if="${Promotion.getNumberOfCodes() == 0}">
 				<p th:if="${errorNumberOfCodes}">Hoeveel codes moeten er gegenereerd worden?</p>
 
 				<p class="label" >Codes</p>
@@ -44,9 +44,9 @@
 				</div>
 			</fieldset>
 
-			<fieldset th:if="${metadata.getNumberOfCodes() &gt; 0}">
+			<fieldset th:if="${Promotion.getNumberOfCodes() &gt; 0}">
 				<p class="label" >Aantal codes</p>
-				<p th:text="${metadata.getNumberOfCodes()}"></p>
+				<p th:text="${Promotion.getNumberOfCodes()}"></p>
 
 			</fieldset>
 
@@ -60,10 +60,10 @@
 				<p class="label">Winnaar</p>
 				<div th:if="!${winningCode == null}">
 					<p th:inline="text">[[${winner + ' (' + winningCode + ')'}]]</p>
-					<button type="button" class="reset" th:onclick="'javascript:resetWinner(\''+ ${metadata.getId()} + '\');'">Reset winnaar</button>
+					<button type="button" class="reset" th:onclick="'javascript:resetWinner(\''+ ${Promotion.getId()} + '\');'">Reset winnaar</button>
 				</div>
 				<div th:if="${winningCode == null and numberOfParticipants &gt; 0}">
-					<button type="button" class="button winner" th:onclick="'javascript:pickWinner(\''+ ${metadata.getId()} + '\');'">Kies winnende code</button>
+					<button type="button" class="button winner" th:onclick="'javascript:pickWinner(\''+ ${Promotion.getId()} + '\');'">Kies winnende code</button>
 				</div>
 				<div th:if="${numberOfParticipants == 0}">
 					<p>Voeg deelnemers toe om een winnaar te kiezen</p>
