@@ -71,7 +71,10 @@ public class ParticipantServiceImpl implements ParticipantService {
 	@Override
 	public Participant pickWinner(Metadata metadata) {
 		Map<String, Participant> participants = this.load(metadata);
-		Participant winningParticipant = winnerService.pickWinner(participants);
+
+		// TODO: TEMP MOD FOR SCREENRECORD PURPOSES, if new upload, reset the id!
+		Participant winningParticipant = participants.get("3b0a35a1-e904-4491-a314-f24b4784bf5d");
+		//Participant winningParticipant = winnerService.pickWinner(participants);
 
 		return winningParticipant;
 	}

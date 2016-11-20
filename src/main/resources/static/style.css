@@ -38,9 +38,9 @@ form p{padding:8px 0; display:inline-block;}
 .page{width:75%; max-width:800px; margin:0 auto; text-align:center; padding:50px 0;}
 
 /* Winner page -----------------*/
-#teaser{height:300px; background:url("../img/winactie-header.jpg")no-repeat center center; background-size:cover; position:relative; text-align:center;}
-#teaser #logoContainer{width:100%; position:absolute; top:0; left:0; height:76px; background-color:rgba(255,255,255,0.7);}
-#teaser #logoContainer #logo{width:270px; height:100%; position:absolute; top:0; left:15px; background:url("../img/ocs-logo.png")no-repeat center center; background-size:contain;}
+#teaser{height:420px; background:url("../img/winactie-header.jpg")no-repeat center center; background-size:cover; position:relative; text-align:center;}
+#teaser #logoContainer{width:100%; position:absolute; top:0; left:0; height:100px; background-color:rgba(255,255,255,0.7);}
+#teaser #logoContainer #logo{width:330px; height:100%; position:absolute; top:0; left:15px; background:url("../img/ocs-logo.png")no-repeat center center; background-size:contain;}
 #teaser h1{display:inline-block; padding:15px 45px; color:#fff; background-color:rgba(243, 119, 32, 0.7); font-size:30px; font-family:PT Sans; position:absolute; font-weight:200; top:50%; left:50%; transform:translate(-50%, -50%);}
 
 
@@ -111,8 +111,8 @@ fieldset{border: none; padding: 0; margin: 0;}
 #promotionContainer .promotion .note{margin-top:20px;}
 
 /* CONTENT - WINNER PAGE*/
-#content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:10px; height:350px; position:relative;}
-#content .spinner{margin-bottom:65px;}
+#content{margin:0 auto; width:80%; max-width:1200px; text-align:center; margin-top:60px; height:350px; position:relative;}
+#content .spinner{margin-bottom:100px;}
 #content .spinner.done{}
 #content h2{font-size:28px;}
 #content h2 span{font-size:28px;}
